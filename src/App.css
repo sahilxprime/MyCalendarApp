@@ -1,10 +1,9 @@
-/* MyCalendarApp Final Professional Fix */
+/* MyCalendarApp Final "Bulletproof" Fix */
 
 #root {
   width: 100%;
   margin: 0;
   padding: 0;
-  text-align: center;
 }
 
 body {
@@ -13,14 +12,13 @@ body {
   background-color: #f8f9fa;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   
-  /* Status Bar Glitch Fix: Content ko hamesha safe area ke niche rakhta hai */
+  /* Status Bar Fix: Isse content notch ke niche nahi chhipega */
   padding-top: env(safe-area-inset-top, 60px); 
   
-  /* Bottom Nav Glitch Fix */
-  padding-bottom: env(safe-area-inset-bottom, 25px);
+  /* Bottom Nav Fix: Gesture bar ke liye space */
+  padding-bottom: env(safe-area-inset-bottom, 30px);
   
   overflow-x: hidden;
-  color: #333;
 }
 
 .app-container {
@@ -29,19 +27,18 @@ body {
   min-height: 100vh;
 }
 
-/* Header Section: Title aur Year */
+/* Header Section: Yahan humne extra space di hai */
 header {
-  /* Extra padding taaki title status bar se kaafi niche dikhe */
-  padding: 40px 1.5rem 10px 1.5rem; 
+  /* Padding badha kar 80px kar di hai taaki February niche aa jaye */
+  padding: 80px 1.5rem 10px 1.5rem; 
   text-align: left;
 }
 
 .month-title {
   font-size: 3rem;
   font-weight: 800;
-  color: #2ecc71; /* Green color jaisa aapke design mein hai */
+  color: #2ecc71; /* Green color */
   margin: 0;
-  letter-spacing: -1.5px;
   line-height: 1;
 }
 
@@ -52,13 +49,12 @@ header {
   font-weight: 600;
 }
 
-/* Calendar Grid: Dates ki alignment theek karne ke liye */
+/* Calendar Grid */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 10px;
   padding: 20px 1.5rem;
-  margin-top: 10px;
 }
 
 .day-name {
@@ -77,16 +73,14 @@ header {
   font-size: 1.2rem;
   font-weight: 600;
   border-radius: 50%;
-  position: relative;
 }
 
-/* Aaj ki date ka special black circle */
 .date-box.active {
   background-color: #000;
   color: #fff;
 }
 
-/* Holiday Cards Styling */
+/* Holiday Card */
 .card {
   margin: 20px 1.5rem;
   padding: 2rem;
@@ -94,24 +88,21 @@ header {
   background: white;
   box-shadow: 0 12px 40px rgba(0,0,0,0.04);
   text-align: left;
-  border: 1px solid rgba(0,0,0,0.01);
 }
 
-/* Bottom Navigation Fix: Gesture bar ke upar safe rakhta hai */
+/* Bottom Navigation Fix */
 .bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(15px);
+  background: white;
   display: flex;
   justify-content: space-around;
   padding-top: 15px;
-  /* Safe area padding zaroori hai */
-  padding-bottom: calc(env(safe-area-inset-bottom, 25px) + 10px);
-  border-top: 1px solid rgba(0,0,0,0.06);
-  z-index: 1000;
+  padding-bottom: calc(env(safe-area-inset-bottom, 25px) + 15px);
+  border-top: 1px solid rgba(0,0,0,0.05);
+  z-index: 9999;
 }
 
 .nav-item {
@@ -128,8 +119,7 @@ header {
   color: #1a73e8;
 }
 
-/* Content ko scroll ke waqt bottom nav ke peeche chhupne se rokne ke liye */
 main {
   flex: 1;
-  padding-bottom: 140px; 
+  padding-bottom: 150px; 
 }
