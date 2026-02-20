@@ -1,0 +1,61 @@
+name: Build Android App Bundle (AAB)
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install NPM Dependencies
+      run: npm ci
+
+    - name: Build Web App
+      run: npm run build
+
+    - name: Sync Capacitor Android Project
+      run: npx cap sync android
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+
+    - name: Generate Random Keystore (For Demo/Testing)
+      run: |
+        keytool -genkey -v -keystore android/app/release-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias my-alias -dname "CN=AI Studio, OU=Development, O=AI Studio, L=SF, S=CA, C=US" -storepass password -keypass password
+      # Note: For production, you should generate the keystore locally, convert it to base64, save it in GitHub Secrets, and decode it here.
+
+    - name: Build Signed AAB & Debug APK
+      working-directory: ./android
+      run: |
+        chmod +x gradlew
+        ./gradlew bundleRelease -Pandroid.injected.signing.store.file=release-key.jks -Pandroid.injected.signing.store.password=password -Pandroid.injected.signing.key.alias=my-alias -Pandroid.injected.signing.key.password=password
+        ./gradlew assembleDebug
+
+    - name: Upload AAB Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release-bundle
+        path: android/app/build/outputs/bundle/release/app-release.aab
+        retention-days: 7
+
+    - name: Upload Debug APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug-apk
+        path: android/app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 7
