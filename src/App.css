@@ -1,125 +1,30 @@
-/* MyCalendarApp Final "Bulletproof" Fix */
+/* Direct Tag Targeting Fix */
 
-#root {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  margin: 0;
-  padding: 0;
+/* Content ko status bar se niche lane ke liye */
+main {
+  /* Isse February notch ke niche se bahar aa jayega */
+  padding-top: calc(env(safe-area-inset-top, 44px) + 20px) !important;
   background-color: #f8f9fa;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  
-  /* Status Bar Fix: Isse content notch ke niche nahi chhipega */
-  padding-top: env(safe-area-inset-top, 60px); 
-  
-  /* Bottom Nav Fix: Gesture bar ke liye space */
-  padding-bottom: env(safe-area-inset-bottom, 30px);
-  
-  overflow-x: hidden;
-}
-
-.app-container {
-  display: flex;
-  flex-direction: column;
   min-height: 100vh;
 }
 
-/* Header Section: Yahan humne extra space di hai */
-header {
-  /* Padding badha kar 80px kar di hai taaki February niche aa jaye */
-  padding: 80px 1.5rem 10px 1.5rem; 
-  text-align: left;
+/* Bottom Navigation ko safe area mein lane ke liye */
+nav {
+  /* Gesture bar ke liye space */
+  padding-bottom: env(safe-area-inset-bottom, 20px) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(20px);
 }
 
-.month-title {
-  font-size: 3rem;
-  font-weight: 800;
-  color: #2ecc71; /* Green color */
-  margin: 0;
-  line-height: 1;
+/* Calendar titles ki styling */
+h1, .month-title {
+  font-size: 2.5rem !important;
+  font-weight: 800 !important;
+  color: #2ecc71 !important;
+  margin-top: 10px !important;
 }
 
-.year-title {
-  font-size: 1.3rem;
-  color: #b0b0b0;
-  margin-top: 5px;
-  font-weight: 600;
-}
-
-/* Calendar Grid */
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
-  padding: 20px 1.5rem;
-}
-
-.day-name {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #ddd;
-  text-transform: uppercase;
-  padding-bottom: 10px;
-}
-
-.date-box {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  font-weight: 600;
-  border-radius: 50%;
-}
-
-.date-box.active {
-  background-color: #000;
-  color: #fff;
-}
-
-/* Holiday Card */
-.card {
-  margin: 20px 1.5rem;
-  padding: 2rem;
-  border-radius: 32px;
-  background: white;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.04);
-  text-align: left;
-}
-
-/* Bottom Navigation Fix */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: white;
-  display: flex;
-  justify-content: space-around;
-  padding-top: 15px;
-  padding-bottom: calc(env(safe-area-inset-bottom, 25px) + 15px);
-  border-top: 1px solid rgba(0,0,0,0.05);
-  z-index: 9999;
-}
-
-.nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 0.75rem;
-  color: #bbb;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.nav-item.active {
-  color: #1a73e8;
-}
-
+/* Content navigation ke peeche na chhipe */
 main {
-  flex: 1;
-  padding-bottom: 150px; 
+  padding-bottom: 120px !important;
 }
