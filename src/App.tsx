@@ -10,7 +10,7 @@ function App() {
   return (
     <div className="w-full min-h-screen bg-ios-bg text-ios-text font-sans selection:bg-ios-blue/30 selection:text-ios-blue">
       {/* Main Content Area */}
-      <main className="pt-safe px-4 max-w-md mx-auto h-full min-h-screen overflow-x-hidden">
+      <main className="px-4 max-w-md mx-auto h-full min-h-screen overflow-x-hidden">
         {activeTab === 'calendar' && <CalendarView />}
 
         {activeTab === 'agenda' && (
