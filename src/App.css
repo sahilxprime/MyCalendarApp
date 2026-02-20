@@ -1,4 +1,4 @@
-/* MyCalendarApp Final Fix Code */
+/* MyCalendarApp Final Professional Fix */
 
 #root {
   width: 100%;
@@ -13,13 +13,14 @@ body {
   background-color: #f8f9fa;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   
-  /* Status Bar Glitch Fix: February ko niche dhakelne ke liye */
-  padding-top: env(safe-area-inset-top, 50px);
+  /* Status Bar Glitch Fix: Content ko hamesha safe area ke niche rakhta hai */
+  padding-top: env(safe-area-inset-top, 60px); 
   
-  /* Bottom Bar Glitch Fix: Navigation ko safe rakhne ke liye */
-  padding-bottom: env(safe-area-inset-bottom, 20px);
+  /* Bottom Nav Glitch Fix */
+  padding-bottom: env(safe-area-inset-bottom, 25px);
   
   overflow-x: hidden;
+  color: #333;
 }
 
 .app-container {
@@ -28,42 +29,44 @@ body {
   min-height: 100vh;
 }
 
-/* Header styling taaki title ekdum saaf aur professional dikhe */
+/* Header Section: Title aur Year */
 header {
-  padding: 20px 1.5rem 10px 1.5rem;
+  /* Extra padding taaki title status bar se kaafi niche dikhe */
+  padding: 40px 1.5rem 10px 1.5rem; 
   text-align: left;
 }
 
 .month-title {
-  font-size: 2.8rem;
+  font-size: 3rem;
   font-weight: 800;
-  color: #2ecc71; /* Green color jaisa aapki app mein hai */
+  color: #2ecc71; /* Green color jaisa aapke design mein hai */
   margin: 0;
-  letter-spacing: -1px;
+  letter-spacing: -1.5px;
+  line-height: 1;
 }
 
 .year-title {
-  font-size: 1.2rem;
-  color: #a0a0a0;
-  margin: 0;
-  font-weight: 500;
+  font-size: 1.3rem;
+  color: #b0b0b0;
+  margin-top: 5px;
+  font-weight: 600;
 }
 
-/* Calendar Grid Alignment Fix: Saari dates line mein rahengi */
+/* Calendar Grid: Dates ki alignment theek karne ke liye */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
-  padding: 15px;
-  margin-top: 5px;
+  gap: 10px;
+  padding: 20px 1.5rem;
+  margin-top: 10px;
 }
 
 .day-name {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  color: #ccc;
+  color: #ddd;
   text-transform: uppercase;
-  padding-bottom: 12px;
+  padding-bottom: 10px;
 }
 
 .date-box {
@@ -71,52 +74,43 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 600;
   border-radius: 50%;
-  transition: background 0.2s;
+  position: relative;
 }
 
+/* Aaj ki date ka special black circle */
 .date-box.active {
-  background-color: #000; /* Jaisa aapke screenshot mein hai */
+  background-color: #000;
   color: #fff;
 }
 
-.date-box.today-dot::after {
-  content: '';
-  position: absolute;
-  bottom: 5px;
-  width: 4px;
-  height: 4px;
-  background: #ff9f43;
-  border-radius: 50%;
-}
-
-/* Event Card Styling: Pizza Day aur Republic Day cards */
+/* Holiday Cards Styling */
 .card {
-  margin: 20px;
-  padding: 1.8rem;
-  border-radius: 28px;
+  margin: 20px 1.5rem;
+  padding: 2rem;
+  border-radius: 32px;
   background: white;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.04);
   text-align: left;
-  border: 1px solid rgba(0,0,0,0.02);
+  border: 1px solid rgba(0,0,0,0.01);
 }
 
-/* Bottom Navigation Styling Fix: Gesture bar ke upar safely dikhega */
+/* Bottom Navigation Fix: Gesture bar ke upar safe rakhta hai */
 .bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(15px);
   display: flex;
   justify-content: space-around;
   padding-top: 15px;
-  /* Safe area bottom padding zaroori hai */
-  padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 10px);
-  border-top: 1px solid rgba(0,0,0,0.05);
+  /* Safe area padding zaroori hai */
+  padding-bottom: calc(env(safe-area-inset-bottom, 25px) + 10px);
+  border-top: 1px solid rgba(0,0,0,0.06);
   z-index: 1000;
 }
 
@@ -125,7 +119,7 @@ header {
   flex-direction: column;
   align-items: center;
   font-size: 0.75rem;
-  color: #999;
+  color: #bbb;
   text-decoration: none;
   font-weight: 600;
 }
@@ -134,8 +128,8 @@ header {
   color: #1a73e8;
 }
 
-/* Main content ko scroll ke waqt bottom nav ke peeche chhupne se rokne ke liye */
+/* Content ko scroll ke waqt bottom nav ke peeche chhupne se rokne ke liye */
 main {
   flex: 1;
-  padding-bottom: 120px; 
+  padding-bottom: 140px; 
 }
