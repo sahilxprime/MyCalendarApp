@@ -13,14 +13,18 @@ function App() {
   useEffect(() => {
     const loadHolidays = async () => {
       try {
-        // Error Fix 1: API ko current year (2026) aur Country Code ('IN') de diya
-        const data = await fetchHolidays(2026, 'IN');
+        // Automatically current year nikalne ke liye
+        const currentYear = new Date().getFullYear(); 
+        const data = await fetchHolidays(currentYear, 'IN');
         setHolidays(data);
-        console.log("Holidays Data aagaya: ", data);
+        console.log(`${currentYear} ke Holidays load ho gaye.`);
       } catch (error) {
         console.error("Holidays laane mein error aayi: ", error);
       }
     };
+
+    loadHolidays();
+  }, []);
 
     loadHolidays();
   }, []);
