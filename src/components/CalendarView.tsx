@@ -1,8 +1,8 @@
 import { useState, memo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { format, addMonths, subMonths } from 'date-fns';
+import { format, addMonths, subMonths, parseISO, isSameDay as fnsIsSameDay } from 'date-fns';
 import { ChevronLeft, ChevronRight, Sparkles, MapPin } from 'lucide-react';
-import { getDaysInMonth, getHolidaysForDate, isSameMonth, isSameDay } from '../utils/dateUtils';
+import { getDaysInMonth, isSameMonth, isSameDay } from '../utils/dateUtils';
 import { cn } from '../utils/cn';
 
 interface CalendarViewProps {
@@ -10,8 +10,6 @@ interface CalendarViewProps {
 }
 
 export const CalendarView = memo(function CalendarView({ holidays = [] }: CalendarViewProps) {
-    console.log("Calendar Holidays: ", holidays); // Error fix: 'holidays' is never read
-
     const [currentDate, setCurrentDate] = useState(new Date("2026-01-01T00:00:00"));
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [direction, setDirection] = useState(0);
@@ -30,24 +28,19 @@ export const CalendarView = memo(function CalendarView({ holidays = [] }: Calend
     const days = getDaysInMonth(currentDate);
     const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+    // API ke asli data se holidays nikalne ka naya function
+    const getRealHolidaysForDate = (day: Date) => {
+        return holidays.filter(h => {
+            const dStr = h.date?.iso || h.date;
+            if (!dStr) return false;
+            return fnsIsSameDay(parseISO(dStr), day);
+        });
+    };
+
     const variants = {
-        enter: (direction: number) => ({
-            x: direction > 0 ? 300 : -300,
-            opacity: 0,
-            scale: 0.9
-        }),
-        center: {
-            zIndex: 1,
-            x: 0,
-            opacity: 1,
-            scale: 1
-        },
-        exit: (direction: number) => ({
-            zIndex: 0,
-            x: direction > 0 ? -300 : 300,
-            opacity: 0,
-            scale: 0.9
-        })
+        enter: (direction: number) => ({ x: direction > 0 ? 300 : -300, opacity: 0, scale: 0.9 }),
+        center: { zIndex: 1, x: 0, opacity: 1, scale: 1 },
+        exit: (direction: number) => ({ zIndex: 0, x: direction > 0 ? -300 : 300, opacity: 0, scale: 0.9 })
     };
 
     return (
@@ -66,27 +59,17 @@ export const CalendarView = memo(function CalendarView({ holidays = [] }: Calend
                         onClick={() => setIsLocalMode(!isLocalMode)}
                         className={cn(
                             "p-2.5 rounded-full transition-all flex items-center shadow-sm",
-                            isLocalMode
-                                ? "bg-ios-orange text-white ring-4 ring-ios-orange/20"
-                                : "bg-ios-card text-ios-gray border border-ios-gray-light"
+                            isLocalMode ? "bg-ios-orange text-white ring-4 ring-ios-orange/20" : "bg-ios-card text-ios-gray border border-ios-gray-light"
                         )}
                     >
                         <MapPin size={20} strokeWidth={isLocalMode ? 3 : 2} />
                     </motion.button>
 
                     <div className="flex space-x-1 bg-ios-card rounded-full p-1 border border-ios-gray-light shadow-sm">
-                        <motion.button
-                            whileTap={{ scale: 0.9 }}
-                            onClick={handlePreviousMonth}
-                            className="p-2 rounded-full text-ios-gray hover:text-ios-blue transition-colors"
-                        >
+                        <motion.button whileTap={{ scale: 0.9 }} onClick={handlePreviousMonth} className="p-2 rounded-full text-ios-gray hover:text-ios-blue transition-colors">
                             <ChevronLeft size={22} strokeWidth={2.5} />
                         </motion.button>
-                        <motion.button
-                            whileTap={{ scale: 0.9 }}
-                            onClick={handleNextMonth}
-                            className="p-2 rounded-full text-ios-gray hover:text-ios-blue transition-colors"
-                        >
+                        <motion.button whileTap={{ scale: 0.9 }} onClick={handleNextMonth} className="p-2 rounded-full text-ios-gray hover:text-ios-blue transition-colors">
                             <ChevronRight size={22} strokeWidth={2.5} />
                         </motion.button>
                     </div>
@@ -95,9 +78,7 @@ export const CalendarView = memo(function CalendarView({ holidays = [] }: Calend
 
             <div className="grid grid-cols-7 mb-3 px-2">
                 {weekDays.map(day => (
-                    <div key={day} className="text-center text-[10px] font-bold text-ios-gray/60 uppercase tracking-widest">
-                        {day}
-                    </div>
+                    <div key={day} className="text-center text-[10px] font-bold text-ios-gray/60 uppercase tracking-widest">{day}</div>
                 ))}
             </div>
 
@@ -114,7 +95,7 @@ export const CalendarView = memo(function CalendarView({ holidays = [] }: Calend
                         className="grid grid-cols-7 gap-y-3 gap-x-1"
                     >
                         {days.map((day) => {
-                            let dayHolidays = getHolidaysForDate(day);
+                            let dayHolidays = getRealHolidaysForDate(day);
                             if (isLocalMode) {
                                 dayHolidays = dayHolidays.filter(h => h.type === 'indian' || h.type === 'regional' || h.type === 'important');
                             }
@@ -143,13 +124,13 @@ export const CalendarView = memo(function CalendarView({ holidays = [] }: Calend
                                     </motion.button>
 
                                     <div className="flex justify-center space-x-0.5 mt-1 bottom-0 absolute">
-                                        {dayHolidays.slice(0, 3).map((holiday) => (
+                                        {dayHolidays.slice(0, 3).map((holiday, i) => (
                                             <motion.div
                                                 initial={{ scale: 0 }}
                                                 animate={{ scale: 1 }}
-                                                key={holiday.id}
+                                                key={holiday.id || i}
                                                 className="w-1.5 h-1.5 rounded-full shadow-sm"
-                                                style={{ backgroundColor: holiday.color }}
+                                                style={{ backgroundColor: holiday.color || '#ff3b30' }}
                                             />
                                         ))}
                                     </div>
@@ -169,35 +150,35 @@ export const CalendarView = memo(function CalendarView({ holidays = [] }: Calend
                         transition={{ type: "spring", stiffness: 350, damping: 25 }}
                         className="mt-2"
                     >
-                        {getHolidaysForDate(selectedDate).length > 0 ? (
+                        {getRealHolidaysForDate(selectedDate).length > 0 ? (
                             <div className="space-y-3">
-                                {getHolidaysForDate(selectedDate)
+                                {getRealHolidaysForDate(selectedDate)
                                     .filter(holiday => !isLocalMode || ['indian', 'regional', 'important'].includes(holiday.type))
-                                    .map(holiday => (
+                                    .map((holiday, i) => (
                                         <motion.div
                                             whileTap={{ scale: 0.96 }}
-                                            key={holiday.id}
+                                            key={holiday.id || i}
                                             className="bg-ios-card rounded-[32px] p-5 shadow-sm border border-ios-gray-light relative overflow-hidden group cursor-pointer"
                                         >
                                             <div
                                                 className="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-10 mix-blend-multiply filter blur-2xl transition-transform group-hover:scale-150"
-                                                style={{ backgroundColor: holiday.color }}
+                                                style={{ backgroundColor: holiday.color || '#ff3b30' }}
                                             />
 
                                             <div className="flex items-start mb-3 relative z-10">
-                                                <div className="text-5xl mr-4 drop-shadow-md">{holiday.emoji}</div>
+                                                <div className="text-5xl mr-4 drop-shadow-md">{holiday.emoji || '📅'}</div>
                                                 <div className="flex-1 pt-1">
                                                     <div className="flex items-center space-x-2">
                                                         <h4 className="font-extrabold text-xl tracking-tight text-ios-text">{holiday.name}</h4>
                                                     </div>
                                                     <p className="text-[13px] font-medium text-ios-gray/80 uppercase tracking-widest mt-1">
-                                                        {holiday.type}
+                                                        {holiday.type || 'Holiday'}
                                                     </p>
                                                 </div>
                                             </div>
 
                                             <p className="text-[15px] text-ios-gray leading-relaxed relative z-10 font-medium">
-                                                {holiday.description}
+                                                {holiday.description || 'Special day'}
                                             </p>
 
                                             {holiday.funFact && (
