@@ -3,7 +3,13 @@ import { motion } from 'framer-motion';
 import { format, parseISO } from 'date-fns';
 import { getUpcomingHolidays } from '../utils/dateUtils';
 
-export const AgendaView = memo(function AgendaView() {
+// 👇 YEH NAYA CODE ADD KIYA HAI DATA KO ACCEPT KARNE KE LIYE
+interface AgendaViewProps {
+    holidays?: any[];
+}
+
+// 👇 YAHAN 'holidays' PROP ADD KIYA HAI TAAKI TS ERROR NA AAYE
+export const AgendaView = memo(function AgendaView({ holidays = [] }: AgendaViewProps) {
     const upcomingHolidays = getUpcomingHolidays(new Date("2026-01-01T00:00:00"), 20); // Get next 20 holidays from start of 2026
 
     const containerVariants = {
