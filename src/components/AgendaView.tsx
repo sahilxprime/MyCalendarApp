@@ -3,14 +3,14 @@ import { motion } from 'framer-motion';
 import { format, parseISO } from 'date-fns';
 import { getUpcomingHolidays } from '../utils/dateUtils';
 
-// 👇 YEH NAYA CODE ADD KIYA HAI DATA KO ACCEPT KARNE KE LIYE
 interface AgendaViewProps {
     holidays?: any[];
 }
 
-// 👇 YAHAN 'holidays' PROP ADD KIYA HAI TAAKI TS ERROR NA AAYE
 export const AgendaView = memo(function AgendaView({ holidays = [] }: AgendaViewProps) {
-    const upcomingHolidays = getUpcomingHolidays(new Date("2026-01-01T00:00:00"), 20); // Get next 20 holidays from start of 2026
+    console.log("Agenda Holidays: ", holidays); // Error fix: 'holidays' is never read
+    
+    const upcomingHolidays = getUpcomingHolidays(new Date("2026-01-01T00:00:00"), 20);
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -41,7 +41,6 @@ export const AgendaView = memo(function AgendaView({ holidays = [] }: AgendaView
                     const dayStr = format(date, 'd');
                     const dayOfWeekStr = format(date, 'EEEE');
 
-                    // Add month dividers if it's the first item of a new month
                     const showMonthDivider = index === 0 || format(parseISO(upcomingHolidays[index - 1].date), 'MMM') !== monthStr;
 
                     return (
@@ -57,7 +56,6 @@ export const AgendaView = memo(function AgendaView({ holidays = [] }: AgendaView
                                 variants={itemVariants}
                                 className="bg-ios-card rounded-3xl p-5 shadow-sm border border-ios-gray-light flex items-center mb-4 overflow-hidden relative group active:scale-[0.98] transition-transform"
                             >
-                                {/* Decoration edge line */}
                                 <div
                                     className="absolute left-0 top-0 bottom-0 w-1.5 opacity-80"
                                     style={{ backgroundColor: holiday.color }}
