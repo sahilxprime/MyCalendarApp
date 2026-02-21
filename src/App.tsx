@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { fetchHolidays } from './utils/api';
 import './App.css'; // <--- YE LINE ZAROORI HAI
 import { Calendar as CalendarIcon, List, Info } from 'lucide-react';
 import { CalendarView } from './components/CalendarView';
