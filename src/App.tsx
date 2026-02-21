@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { fetchHolidays } from './utils/api';
-import './App.css'; // <--- YE LINE ZAROORI HAI
+import './App.css';
 import { Calendar as CalendarIcon, List, Info } from 'lucide-react';
 import { CalendarView } from './components/CalendarView';
 import { AgendaView } from './components/AgendaView';
@@ -8,12 +8,13 @@ import { AboutView } from './components/AboutView';
 
 function App() {
   const [activeTab, setActiveTab] = useState<'calendar' | 'agenda' | 'about'>('calendar');
-const [holidays, setHolidays] = useState<any[]>([]);
+  const [holidays, setHolidays] = useState<any[]>([]);
 
   useEffect(() => {
     const loadHolidays = async () => {
       try {
-        const data = await fetchHolidays();
+        // Error Fix 1: API ko current year (2026) aur Country Code ('IN') de diya
+        const data = await fetchHolidays(2026, 'IN');
         setHolidays(data);
         console.log("Holidays Data aagaya: ", data);
       } catch (error) {
@@ -23,34 +24,46 @@ const [holidays, setHolidays] = useState<any[]>([]);
 
     loadHolidays();
   }, []);
+
+  // Error Fix 2: Code ko pata chal gaya ki holidays use ho raha hai
+  console.log("Current Holidays state:", holidays);
+
   return (
     <div className="app-main-container">
       <main className="main-content">
-        {activeTab === 'calendar' && <CalendarView />}
+        {activeTab === 'calendar' && <CalendarView holidays={holidays} />}
         {activeTab === 'agenda' && (
           <div className="agenda-header">
             <h1 className="text-3xl font-bold mb-6 tracking-tight px-2">Upcoming</h1>
-            <AgendaView />
+            <AgendaView holidays={holidays} />
           </div>
         )}
         {activeTab === 'about' && <AboutView />}
       </main>
 
+      {/* Bottom Navigation */}
       <nav className="bottom-nav">
-        <div className="nav-container">
-          <button onClick={() => setActiveTab('calendar')} className={`nav-btn ${activeTab === 'calendar' ? 'active' : ''}`}>
-            <CalendarIcon size={26} strokeWidth={activeTab === 'calendar' ? 2.5 : 2} />
-            <span>Calendar</span>
-          </button>
-          <button onClick={() => setActiveTab('agenda')} className={`nav-btn ${activeTab === 'agenda' ? 'active' : ''}`}>
-            <List size={26} strokeWidth={activeTab === 'agenda' ? 2.5 : 2} />
-            <span>Agenda</span>
-          </button>
-          <button onClick={() => setActiveTab('about')} className={`nav-btn ${activeTab === 'about' ? 'active' : ''}`}>
-            <Info size={26} strokeWidth={activeTab === 'about' ? 2.5 : 2} />
-            <span>About</span>
-          </button>
-        </div>
+        <button 
+          className={`nav-item ${activeTab === 'calendar' ? 'active' : ''}`}
+          onClick={() => setActiveTab('calendar')}
+        >
+          <CalendarIcon size={24} />
+          <span>Calendar</span>
+        </button>
+        <button 
+          className={`nav-item ${activeTab === 'agenda' ? 'active' : ''}`}
+          onClick={() => setActiveTab('agenda')}
+        >
+          <List size={24} />
+          <span>Agenda</span>
+        </button>
+        <button 
+          className={`nav-item ${activeTab === 'about' ? 'active' : ''}`}
+          onClick={() => setActiveTab('about')}
+        >
+          <Info size={24} />
+          <span>About</span>
+        </button>
       </nav>
     </div>
   );
