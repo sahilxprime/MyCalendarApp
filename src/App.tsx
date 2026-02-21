@@ -13,8 +13,8 @@ function App() {
   useEffect(() => {
     const loadHolidays = async () => {
       try {
-        // Automatically current year nikalne ke liye
-        const currentYear = new Date().getFullYear(); 
+        // Automatically current year (2026) nikalne ke liye
+        const currentYear = new Date().getFullYear();
         const data = await fetchHolidays(currentYear, 'IN');
         setHolidays(data);
         console.log(`${currentYear} ke Holidays load ho gaye.`);
@@ -24,13 +24,7 @@ function App() {
     };
 
     loadHolidays();
-  }, []);
-
-    loadHolidays();
-  }, []);
-
-  // Error Fix 2: Code ko pata chal gaya ki holidays use ho raha hai
-  console.log("Current Holidays state:", holidays);
+  }, []); // Glitch yahan tha, ab ekdum clean hai!
 
   return (
     <div className="app-main-container">
