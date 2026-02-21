@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.aistudio.calendarapp',
-  appName: ' Calendar App',
+  appName: ' Holiday 2026 ',
   webDir: 'dist'
 };
 
