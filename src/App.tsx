@@ -8,7 +8,21 @@ import { AboutView } from './components/AboutView';
 
 function App() {
   const [activeTab, setActiveTab] = useState<'calendar' | 'agenda' | 'about'>('calendar');
+const [holidays, setHolidays] = useState<any[]>([]);
 
+  useEffect(() => {
+    const loadHolidays = async () => {
+      try {
+        const data = await fetchHolidays();
+        setHolidays(data);
+        console.log("Holidays Data aagaya: ", data);
+      } catch (error) {
+        console.error("Holidays laane mein error aayi: ", error);
+      }
+    };
+
+    loadHolidays();
+  }, []);
   return (
     <div className="app-main-container">
       <main className="main-content">
