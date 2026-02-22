@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
+// ✨ NAYI PHOTO YAHAN IMPORT HO RAHI HAI
+import profileImage from './assets/profile.jpg'; 
 
 const App: React.FC = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()); 
@@ -257,7 +259,9 @@ const App: React.FC = () => {
     <div className={`app-container ${isDarkMode ? 'dark-mode' : ''}`}>
       <div className="main-content">
         
-        {/* CALENDAR VIEW */}
+        {/* ====================================
+            CALENDAR VIEW (No changes here) 
+        ==================================== */}
         {view === 'calendar' && (
           <div 
             className="calendar-view"
@@ -295,7 +299,9 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {/* AGENDA VIEW */}
+        {/* ====================================
+            AGENDA VIEW (No changes here) 
+        ==================================== */}
         {view === 'agenda' && (
           <div className="agenda-view animation-fade-in">
             <h1 className="page-title">Upcoming Holidays</h1>
@@ -328,4 +334,124 @@ const App: React.FC = () => {
                 </div>
               ))
             ) : (
-              <p style={{ textAlign: 'center
+              <p style={{ textAlign: 'center', color: '#888', marginTop: '50px' }}>No holidays found.</p>
+            )}
+          </div>
+        )}
+
+        {/* ====================================
+            ✨ NEW ABOUT VIEW (Updated exactly like image) ✨
+        ==================================== */}
+        {view === 'about' && (
+          <div className="about-view animation-fade-in">
+            <h1 className="page-title">About Developer</h1>
+            
+            <div className="dev-card premium-shadow">
+              <div className="dev-profile">
+                <div className="dev-avatar">
+                  {/* ✨ REAL PHOTO YAHA LAG RAHI HAI */}
+                  <img src={profileImage} alt="Sahil" className="profile-image" />
+                </div>
+                <div className="dev-details">
+                  <h3>Sahil</h3>
+                  <p>Lead iOS Developer</p>
+                </div>
+              </div>
+              
+              <div className="dev-links">
+                <a href="https://instagram.com/primexsahil" target="_blank" rel="noreferrer" className="dev-link-item haptic-btn" onClick={triggerHaptic}>
+                  <div className="link-icon insta-gradient">📸</div>
+                  <div className="link-text">
+                    <span>Instagram</span>
+                    <strong>@primexsahil</strong>
+                  </div>
+                  <div className="link-arrow">›</div>
+                </a>
+
+                <a href="mailto:primexsahil45@gmail.com" className="dev-link-item haptic-btn" onClick={triggerHaptic}>
+                  <div className="link-icon email-gradient">📧</div>
+                  <div className="link-text">
+                    <span>Email Me</span>
+                    <strong>primexsahil45@gmail.com</strong>
+                  </div>
+                  <div className="link-arrow">›</div>
+                </a>
+
+                <div className="dev-link-item haptic-btn" onClick={triggerHaptic}>
+                  <div className="link-icon location-gradient">📍</div>
+                  <div className="link-text">
+                    <span>Location</span>
+                    <strong>Shimla, HP</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ✨ New Centered Calendar Floating Button */}
+            <div className="fab-container">
+                <button className="fab-btn haptic-btn" onClick={() => handleNavClick('calendar')}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                </button>
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: '10px' }}>
+              <p className="version-text">HOLIDAY 2026 • VERSION 1.0.0 PRO</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* POPUP MODAL (No changes here) */}
+      {selectedHoliday && (
+        <div className="modal-overlay" onClick={() => { triggerHaptic(); setSelectedHoliday(null); }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-handle"></div>
+            <h2 className="modal-title">{selectedHoliday.localName}</h2>
+            <p className="modal-date-text">🗓️ {formatDateString(selectedHoliday.date)}</p>
+            
+            <div className="fun-fact-box">
+              <h4 style={{ margin: '0 0 5px 0', color: '#007aff' }}>✨ Holiday Info</h4>
+              <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5' }}>
+                {selectedHoliday.name} is a major public holiday. It is <strong>{getDaysLeft(selectedHoliday.date)}</strong>!
+              </p>
+            </div>
+
+            <div className="astrology-box">
+              <h4 style={{ margin: '0 0 5px 0', color: '#a020f0' }}>🔮 Astrology Insight</h4>
+              <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5' }}>
+                Zodiac Sign for this day: <strong>{getZodiacSign(selectedHoliday.date)}</strong>
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button className="share-btn haptic-btn" onClick={handleShare}>
+                📲 Share
+              </button>
+              <button className="modal-close-btn haptic-btn" style={{ flex: 1 }} onClick={() => { triggerHaptic(); setSelectedHoliday(null); }}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* BOTTOM NAVIGATION (No changes here) */}
+      <div className="bottom-nav premium-blur">
+        <button className={`nav-item haptic-btn ${view === 'calendar' ? 'active' : ''}`} onClick={() => handleNavClick('calendar')}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          <span>Calendar</span>
+        </button>
+        <button className={`nav-item haptic-btn ${view === 'agenda' ? 'active' : ''}`} onClick={() => handleNavClick('agenda')}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+          <span>Agenda</span>
+        </button>
+        <button className={`nav-item haptic-btn ${view === 'about' ? 'active' : ''}`} onClick={() => handleNavClick('about')}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span>About</span>
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default App;
