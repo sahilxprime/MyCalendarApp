@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 
 const App: React.FC = () => {
@@ -16,6 +16,32 @@ const App: React.FC = () => {
 
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+
+  // 👆 Swipe Logic Setup (using useRef for smooth performance)
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+    touchEndX.current = null; // Reset on new touch
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    
+    const distance = touchStartX.current - touchEndX.current;
+    const minSwipeDistance = 50; // Kitna swipe karne par change hoga
+
+    if (distance > minSwipeDistance) {
+      nextMonth(); // Swipe Left -> Next Month
+    } else if (distance < -minSwipeDistance) {
+      prevMonth(); // Swipe Right -> Prev Month
+    }
+  };
 
   // 📳 Haptic Feedback Logic
   const triggerHaptic = () => {
@@ -241,14 +267,17 @@ const App: React.FC = () => {
                     </option>
                   ))}
                 </select>
-                <div className="nav-arrows">
-                  <button className="haptic-btn" onClick={prevMonth}>&lt;</button>
-                  <button className="haptic-btn" onClick={nextMonth}>&gt;</button>
-                </div>
+                {/* ❌ Removed the < > Nav Arrows as requested */}
               </div>
             </div>
 
-            <div className="calendar-grid">
+            {/* ✅ Added Swipe Events directly to Calendar Grid */}
+            <div 
+              className="calendar-grid"
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+            >
               {daysOfWeek.map(day => (
                 <div key={day} className="day-name">{day}</div>
               ))}
@@ -295,7 +324,7 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {/* ABOUT VIEW - 🌟 PREMIUM iOS REDESIGN & CLICKABLE LINKS */}
+        {/* ABOUT VIEW */}
         {view === 'about' && (
           <div className="about-view animation-fade-in">
             <h1 className="page-title">About Developer</h1>
