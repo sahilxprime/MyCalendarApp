@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 const App: React.FC = () => {
-  // Calendar automatically opens to the current real-world month
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()); 
   const [view, setView] = useState('calendar');
   const [holidays, setHolidays] = useState<any[]>([]);
@@ -10,12 +9,22 @@ const App: React.FC = () => {
   const [availableCountries, setAvailableCountries] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedHoliday, setSelectedHoliday] = useState<any | null>(null); 
+  
+  // 🌟 NEW: Dark Mode State & Search State
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const year = 2026;
 
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-  // 🔮 ASTROLOGY: Zodiac Sign Calculator
+  // 📳 NEW: iOS Style Haptic Feedback (Vibration)
+  const triggerHaptic = () => {
+    if (navigator.vibrate) {
+      navigator.vibrate(40); // Soft vibration
+    }
+  };
+
   const getZodiacSign = (dateString: string) => {
     const d = new Date(dateString);
     const day = d.getDate();
@@ -34,6 +43,20 @@ const App: React.FC = () => {
     return "♑ Capricorn";
   };
 
+  // ⏳ NEW: Countdown Timer Logic
+  const getDaysLeft = (dateString: string) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const holidayDate = new Date(dateString);
+    holidayDate.setHours(0, 0, 0, 0);
+    const diffTime = holidayDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return "🔥 Today!";
+    if (diffDays < 0) return "Passed";
+    return `⏳ In ${diffDays} days`;
+  };
+
   const asianCountries = [
     { countryCode: 'IN', name: 'India' },
     { countryCode: 'PK', name: 'Pakistan' },
@@ -43,7 +66,6 @@ const App: React.FC = () => {
     { countryCode: 'LK', name: 'Sri Lanka' }
   ];
 
-  // 🇮🇳 MASSIVE INDIA FESTIVALS UPDATE (2026)
   const customHolidays: { [key: string]: any[] } = {
     'IN': [
       { date: '2026-01-01', localName: 'New Year\'s Day', name: 'New Year\'s Day' },
@@ -134,17 +156,34 @@ const App: React.FC = () => {
   const daysInMonth = new Date(year, currentMonth + 1, 0).getDate();
   const firstDay = new Date(year, currentMonth, 1).getDay();
 
-  const prevMonth = () => setCurrentMonth(prev => Math.max(prev - 1, 0));
-  const nextMonth = () => setCurrentMonth(prev => Math.min(prev + 1, 11));
+  const prevMonth = () => { triggerHaptic(); setCurrentMonth(prev => Math.max(prev - 1, 0)); };
+  const nextMonth = () => { triggerHaptic(); setCurrentMonth(prev => Math.min(prev + 1, 11)); };
 
   const handleDayClick = (dateString: string) => {
+    triggerHaptic();
     const holiday = holidays.find(h => h.date === dateString);
     if (holiday) setSelectedHoliday(holiday);
   };
 
+  const handleNavClick = (newView: string) => {
+    triggerHaptic();
+    setView(newView);
+  };
+
+  // 📲 NEW: Native Sharing Logic
+  const handleShare = () => {
+    triggerHaptic();
+    const shareText = `Hey! 🗓️ ${selectedHoliday.localName} is on ${formatDateString(selectedHoliday.date)}. It's a ${getZodiacSign(selectedHoliday.date)} day! Let's celebrate! 🚀`;
+    if (navigator.share) {
+      navigator.share({ title: selectedHoliday.localName, text: shareText });
+    } else {
+      window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`);
+    }
+  };
+
   const renderCalendarDays = () => {
     let days = [];
-    const realToday = new Date(); // Asli current date (e.g., Feb 22, 2026)
+    const realToday = new Date(); 
 
     for (let i = 0; i < firstDay; i++) {
       days.push(<div key={`empty-${i}`} className="calendar-day empty"></div>);
@@ -152,8 +191,6 @@ const App: React.FC = () => {
     for (let i = 1; i <= daysInMonth; i++) {
       const dateString = `${year}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
       const isHoliday = holidays.some(h => h.date === dateString);
-      
-      // 🌟 Check if this day is TODAY
       const isToday = realToday.getFullYear() === year && realToday.getMonth() === currentMonth && realToday.getDate() === i;
       
       days.push(
@@ -174,8 +211,14 @@ const App: React.FC = () => {
     return new Date(dateStr).toLocaleDateString('en-US', options);
   };
 
+  // 🔍 NEW: Filter Holidays for Search Bar
+  const filteredHolidays = holidays.filter(h => 
+    h.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    h.localName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="app-container">
+    <div className={`app-container ${isDarkMode ? 'dark-mode' : ''}`}>
       <div className="main-content">
         
         {/* CALENDAR VIEW */}
@@ -187,129 +230,5 @@ const App: React.FC = () => {
                 <h2 className="year-title">{year}</h2>
               </div>
               <div className="controls">
-                <select className="country-select" value={country} onChange={(e) => setCountry(e.target.value)}>
-                  {availableCountries.map((c) => (
-                    <option key={c.countryCode} value={c.countryCode}>
-                      {c.countryCode === 'IN' ? '🇮🇳 India' : c.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="nav-arrows">
-                  <button onClick={prevMonth}>&lt;</button>
-                  <button onClick={nextMonth}>&gt;</button>
-                </div>
-              </div>
-            </div>
-
-            <div className="calendar-grid">
-              {daysOfWeek.map(day => (
-                <div key={day} className="day-name">{day}</div>
-              ))}
-              {renderCalendarDays()}
-            </div>
-          </div>
-        )}
-
-        {/* AGENDA VIEW */}
-        {view === 'agenda' && (
-          <div className="agenda-view animation-fade-in">
-            <h1 className="page-title">Upcoming Holidays</h1>
-            {loading ? (
-              <div className="loading-spinner"></div>
-            ) : holidays.length > 0 ? (
-              holidays.map((h: any, index: number) => (
-                <div key={index} className="agenda-item animation-slide-up" style={{ animationDelay: `${index * 0.05}s` }}>
-                  <div className="agenda-date">
-                    <span className="agenda-day">{new Date(h.date).getDate()}</span>
-                    <span className="agenda-month">{months[new Date(h.date).getMonth()].substring(0,3)}</span>
-                  </div>
-                  <div className="agenda-details">
-                    <strong>{h.localName}</strong>
-                    <p>{h.name}</p>
-                    <span className="zodiac-badge">{getZodiacSign(h.date)}</span>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p style={{ textAlign: 'center', color: '#888', marginTop: '50px' }}>No holidays found for this year.</p>
-            )}
-          </div>
-        )}
-
-        {/* ABOUT VIEW */}
-        {view === 'about' && (
-          <div className="about-view animation-fade-in">
-            <div className="logo-placeholder premium-shadow">
-              <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            </div>
-            <h2 className="app-name-title">Holiday 2026</h2>
-            <p className="version-text">VERSION 1.0.0 PRO</p>
-            
-            <div className="dev-card premium-shadow">
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-                <div className="dev-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5c-1.3 0-2.4.9-2.9 2.1"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
-                </div>
-                <div>
-                  <h3 style={{ margin: 0, color: '#1c1c1e', fontSize: '20px' }}>Sahil</h3>
-                  <p style={{ margin: 0, fontSize: '14px', color: '#8e8e93' }}>Lead iOS Developer</p>
-                </div>
-              </div>
-              <div className="dev-info-row"><span className="emoji">📸</span> @primexsahil</div>
-              <div className="dev-info-row"><span className="emoji">📧</span> primexsahil45@gmail.com</div>
-              <div className="dev-info-row"><span className="emoji">📍</span> Shimla, HP</div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* POPUP MODAL (Now with Astrology) */}
-      {selectedHoliday && (
-        <div className="modal-overlay" onClick={() => setSelectedHoliday(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-handle"></div>
-            <h2 className="modal-title">{selectedHoliday.localName}</h2>
-            <p className="modal-date-text">🗓️ {formatDateString(selectedHoliday.date)}</p>
-            
-            <div className="fun-fact-box">
-              <h4 style={{ margin: '0 0 5px 0', color: '#007aff' }}>✨ Holiday Info</h4>
-              <p style={{ margin: 0, fontSize: '14px', color: '#555', lineHeight: '1.5' }}>
-                {selectedHoliday.name} is a major public holiday. People celebrate it with great joy!
-              </p>
-            </div>
-
-            {/* 🔮 ASTROLOGY BOX IN POPUP */}
-            <div className="astrology-box">
-              <h4 style={{ margin: '0 0 5px 0', color: '#a020f0' }}>🔮 Astrology Insight</h4>
-              <p style={{ margin: 0, fontSize: '14px', color: '#555', lineHeight: '1.5' }}>
-                Zodiac Sign for this day: <strong>{getZodiacSign(selectedHoliday.date)}</strong>
-              </p>
-            </div>
-
-            <button className="modal-close-btn" onClick={() => setSelectedHoliday(null)}>
-              Awesome, Close!
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* BOTTOM NAVIGATION (Untouched & Safe) */}
-      <div className="bottom-nav premium-blur">
-        <button className={`nav-item ${view === 'calendar' ? 'active' : ''}`} onClick={() => setView('calendar')}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-          <span>Calendar</span>
-        </button>
-        <button className={`nav-item ${view === 'agenda' ? 'active' : ''}`} onClick={() => setView('agenda')}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-          <span>Agenda</span>
-        </button>
-        <button className={`nav-item ${view === 'about' ? 'active' : ''}`} onClick={() => setView('about')}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-          <span>About</span>
-        </button>
-      </div>
-    </div>
-  );
-};
-
-export default App;
+                {/* 🌙 Theme Toggle Button */}
+                <button className="theme-toggle" onClick={() =>
