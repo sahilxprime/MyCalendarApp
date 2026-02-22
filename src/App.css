@@ -4,9 +4,11 @@
   display: flex;
   flex-direction: column;
   background-color: #f2f2f7; 
+  color: #1c1c1e;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth Dark Mode Transition */
 }
 
 .main-content {
@@ -16,163 +18,76 @@
 }
 
 /* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes slideUpSheet {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
 .animation-fade-in { animation: fadeIn 0.4s ease-out forwards; }
 .animation-slide-up { animation: fadeIn 0.5s ease-out forwards; opacity: 0; }
 
 /* Header Elements */
 .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
-.month-title { font-size: 34px; font-weight: 800; color: #1c1c1e; margin: 0; letter-spacing: -0.5px; }
+.month-title { font-size: 34px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
 .year-title { font-size: 22px; color: #007aff; margin: 0; font-weight: 700; }
-.page-title { font-size: 32px; font-weight: 800; color: #1c1c1e; margin-bottom: 25px; }
+.page-title { font-size: 32px; font-weight: 800; margin-bottom: 20px; }
 
 /* Controls */
-.controls { display: flex; gap: 12px; align-items: center; }
+.controls { display: flex; gap: 10px; align-items: center; }
+.theme-toggle { background: none; border: none; font-size: 20px; cursor: pointer; padding: 5px; transition: transform 0.2s; }
+.theme-toggle:active { transform: scale(0.8); }
+
 .country-select {
   background: #ffffff; color: #007aff; border: none; border-radius: 20px;
   padding: 10px 16px; font-size: 15px; font-weight: 700;
   box-shadow: 0 4px 14px rgba(0,0,0,0.06); outline: none;
-  max-width: 130px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;
+  max-width: 110px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;
 }
 .nav-arrows { display: flex; background: #ffffff; border-radius: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); overflow: hidden; }
 .nav-arrows button { background: none; border: none; font-size: 18px; padding: 10px 15px; color: #007aff; font-weight: bold; cursor: pointer; }
 
-/* Calendar Grid Layout */
-.calendar-grid { 
-  display: grid; 
-  grid-template-columns: repeat(7, 1fr); 
-  gap: 8px; 
-  text-align: center; 
-}
+/* Calendar Grid */
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
 .day-name { font-size: 12px; font-weight: 700; color: #8e8e93; margin-bottom: 15px; }
-
-/* Default Day */
 .calendar-day {
-  font-size: 16px; color: #1c1c1e; font-weight: 500;
-  display: flex; align-items: center; justify-content: center; 
-  border-radius: 50%;
-  width: 38px; height: 38px; margin: 0 auto; 
-  transition: all 0.2s ease;
+  font-size: 16px; font-weight: 500; display: flex; align-items: center; justify-content: center; 
+  border-radius: 50%; width: 38px; height: 38px; margin: 0 auto; transition: all 0.2s ease;
 }
 
-/* 🌟 TODAY'S DATE HIGHLIGHT (New Addition) */
-.calendar-day.today {
-  background-color: #e1f0ff;
-  color: #007aff;
-  font-weight: 800;
-  border: 2px solid #007aff;
-}
-
-/* 🌟 Holiday Bubble */
-.calendar-day.holiday {
-  background: linear-gradient(135deg, #007aff, #0056b3);
-  color: white; font-weight: 700; cursor: pointer;
-  box-shadow: 0 6px 14px rgba(0, 122, 255, 0.3);
-  border: none; /* Reset border in case it overlaps with today */
-}
-/* If Today is ALSO a Holiday */
-.calendar-day.today.holiday {
-  box-shadow: 0 0 0 3px white, 0 0 0 5px #007aff, 0 6px 14px rgba(0, 122, 255, 0.3);
-}
+/* Today & Holiday Highlights */
+.calendar-day.today { background-color: #e1f0ff; color: #007aff; font-weight: 800; border: 2px solid #007aff; }
+.calendar-day.holiday { background: linear-gradient(135deg, #007aff, #0056b3); color: white; font-weight: 700; cursor: pointer; box-shadow: 0 6px 14px rgba(0, 122, 255, 0.3); border: none; }
+.calendar-day.today.holiday { box-shadow: 0 0 0 3px white, 0 0 0 5px #007aff, 0 6px 14px rgba(0, 122, 255, 0.3); }
 .calendar-day.holiday:active { transform: scale(0.85); }
 
-/* iOS Popup Bottom Sheet */
-.modal-overlay {
-  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
-  z-index: 2000; display: flex; align-items: flex-end;
-  animation: fadeIn 0.3s ease-out;
-}
-.modal-content {
-  background: #ffffff; width: 100%; padding: 30px 25px 40px;
-  border-radius: 35px 35px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
-  animation: slideUpSheet 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-}
-.modal-handle { width: 40px; height: 5px; background: #d1d1d6; border-radius: 10px; margin: 0 auto 20px; }
-.modal-title { font-size: 28px; font-weight: 800; color: #1c1c1e; margin: 0 0 10px 0; }
-.modal-date-text { font-size: 16px; color: #8e8e93; font-weight: 600; margin-bottom: 25px; }
-
-.fun-fact-box {
-  background: #f2f2f7; padding: 20px; border-radius: 20px; margin-bottom: 15px;
-  border-left: 5px solid #007aff;
+/* Search Bar (NEW) */
+.search-bar {
+  width: 100%; padding: 14px 20px; border-radius: 18px; border: none;
+  background: #ffffff; margin-bottom: 25px; box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+  font-size: 16px; outline: none; color: #1c1c1e; font-family: inherit;
 }
 
-/* 🔮 ASTROLOGY BOX (New Addition) */
-.astrology-box {
-  background: #fdf5ff; padding: 20px; border-radius: 20px; margin-bottom: 30px;
-  border-left: 5px solid #a020f0;
-}
-
-.modal-close-btn {
-  width: 100%; padding: 16px; background: #007aff; color: white;
-  border: none; border-radius: 16px; font-size: 18px; font-weight: 700;
-  box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3); cursor: pointer; transition: 0.2s;
-}
-.modal-close-btn:active { transform: scale(0.96); }
-
-/* Agenda List */
+/* Agenda Items */
 .agenda-item {
   display: flex; align-items: center; background: #ffffff;
   padding: 15px; border-radius: 20px; margin-bottom: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-  position: relative;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03); position: relative;
 }
-.agenda-date {
-  background: #f2f2f7; color: #007aff; border-radius: 15px;
-  min-width: 60px; height: 60px; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; margin-right: 15px;
-}
+.agenda-date { background: #f2f2f7; color: #007aff; border-radius: 15px; min-width: 60px; height: 60px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-right: 15px; }
 .agenda-day { font-size: 22px; font-weight: 800; line-height: 1; }
 .agenda-month { font-size: 12px; font-weight: 700; text-transform: uppercase; }
-.agenda-details strong { font-size: 17px; color: #1c1c1e; }
+.agenda-details strong { font-size: 17px; }
 .agenda-details p { margin: 4px 0 0 0; font-size: 14px; color: #8e8e93; }
 
-/* 🔮 Zodiac Badge in Agenda */
-.zodiac-badge {
-  position: absolute; right: 15px; top: 15px; font-size: 18px;
-  background: #fdf5ff; padding: 5px; border-radius: 10px; color: #a020f0;
-}
+/* Countdown & Zodiac (NEW) */
+.countdown-badge { display: inline-block; font-size: 12px; font-weight: 700; color: #ff9500; background: #fff5e5; padding: 4px 10px; border-radius: 10px; margin-top: 6px; }
+.countdown-badge.passed { color: #8e8e93; background: #f2f2f7; }
+.zodiac-badge { position: absolute; right: 15px; top: 15px; font-size: 18px; background: #fdf5ff; padding: 5px; border-radius: 10px; color: #a020f0; }
 
-/* About View */
-.premium-shadow { box-shadow: 0 10px 30px rgba(0,0,0,0.08); background: white; }
-.logo-placeholder {
-  width: 100px; height: 100px; background: linear-gradient(135deg, #007aff, #00b4db);
-  border-radius: 30px; margin: 0 auto; display: flex; align-items: center;
-  justify-content: center;
-}
-.app-name-title { text-align: center; margin: 20px 0 5px; font-size: 24px; font-weight: 800; }
-.version-text { text-align: center; color: #8e8e93; font-size: 13px; font-weight: 700; letter-spacing: 1px; }
-.dev-card { padding: 25px; border-radius: 25px; margin: 30px 0; }
-.dev-icon { width: 45px; height: 45px; border-radius: 12px; background: #e1f0ff; color: #007aff; display: flex; align-items: center; justify-content: center; margin-right: 15px; }
-.dev-info-row { margin: 12px 0; font-size: 15px; color: #3a3a3c; font-weight: 500; display: flex; align-items: center; }
-.emoji { margin-right: 10px; font-size: 18px; }
-
-/* Bottom Nav - SAFE */
-.bottom-nav {
-  height: 85px;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  border-top: 1px solid rgba(0,0,0,0.05);
-  background: rgba(255, 255, 255, 0.85); 
-  backdrop-filter: saturate(180%) blur(20px);
-  flex-shrink: 0; 
-  padding-bottom: env(safe-area-inset-bottom, 10px); 
-}
-
-.nav-item {
-  display: flex; flex-direction: column; align-items: center;
-  background: none; border: none; color: #8e8e93; cursor: pointer;
-}
-.nav-icon { stroke: #8e8e93; margin-bottom: 4px; transition: all 0.2s ease; }
-.nav-item span { font-size: 11px; font-weight: 600; }
-
-.nav-item.active { color: #007aff; }
-.nav-item.active .nav-icon { stroke: #007aff; transform: scale(1.1); }
+/* Modal Elements */
+.modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 2000; display: flex; align-items: flex-end; animation: fadeIn 0.3s ease-out; }
+.modal-content { background: #ffffff; width: 100%; padding: 30px 25px 40px; border-radius: 35px 35px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.15); animation: slideUpSheet 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.modal-handle { width: 40px; height: 5px; background: #d1d1d6; border-radius: 10px; margin: 0 auto 20px; }
+.modal-title { font-size: 28px; font-weight: 800; margin: 0 0 10px 0; }
+.modal-date-text { font-size: 16px; color: #8e8e93; font-weight: 600; margin-bottom: 25px; }
+.fun-fact-box { background: #f2f2f7; padding: 20px; border-radius: 20px; margin-bottom: 15px; border-left: 5px solid #007aff; }
+.fun-fact-box p { color: #555; }
+.astrology-box { background: #fdf5ff; padding: 20px; border-radius: 20px; margin-bottom: 30px; border-left: 5px solid #a020f0; }
+.astrology-box p { color: #555; }
