@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
-// ✨ NAYI PHOTO YAHAN IMPORT HO RAHI HAI
-import profileImage from './assets/profile.jpg'; 
 
 const App: React.FC = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()); 
@@ -15,14 +13,12 @@ const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Safe Animation State
   const [slideDirection, setSlideDirection] = useState('fade'); 
   const year = 2026;
 
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-  // 👆 Swipe Logic Setup
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
 
@@ -61,7 +57,6 @@ const App: React.FC = () => {
     setCurrentMonth(prev => prev - 1);
   };
 
-  // 📳 Haptic Feedback Logic
   const triggerHaptic = () => {
     try {
       if (navigator.vibrate) navigator.vibrate(40);
@@ -259,9 +254,7 @@ const App: React.FC = () => {
     <div className={`app-container ${isDarkMode ? 'dark-mode' : ''}`}>
       <div className="main-content">
         
-        {/* ====================================
-            CALENDAR VIEW (No changes here) 
-        ==================================== */}
+        {/* CALENDAR VIEW */}
         {view === 'calendar' && (
           <div 
             className="calendar-view"
@@ -299,9 +292,7 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {/* ====================================
-            AGENDA VIEW (No changes here) 
-        ==================================== */}
+        {/* ✨ UPDATED AGENDA VIEW (Overlap Fixed) ✨ */}
         {view === 'agenda' && (
           <div className="agenda-view animation-fade-in">
             <h1 className="page-title">Upcoming Holidays</h1>
@@ -326,10 +317,15 @@ const App: React.FC = () => {
                   <div className="agenda-details">
                     <strong>{h.localName}</strong>
                     <p>{h.name}</p>
-                    <span className={`countdown-badge ${getDaysLeft(h.date) === 'Passed' ? 'passed' : ''}`}>
-                      {getDaysLeft(h.date)}
-                    </span>
-                    <span className="zodiac-badge">{getZodiacSign(h.date)}</span>
+                    
+                    {/* ✅ FIX: Badge row flex container se overlap khatam */}
+                    <div className="badge-row">
+                      <span className={`countdown-badge ${getDaysLeft(h.date) === 'Passed' ? 'passed' : ''}`}>
+                        {getDaysLeft(h.date)}
+                      </span>
+                      <span className="zodiac-badge">{getZodiacSign(h.date)}</span>
+                    </div>
+                    
                   </div>
                 </div>
               ))
@@ -339,9 +335,7 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {/* ====================================
-            ✨ NEW ABOUT VIEW (Updated exactly like image) ✨
-        ==================================== */}
+        {/* ABOUT VIEW (100% Build Safe) */}
         {view === 'about' && (
           <div className="about-view animation-fade-in">
             <h1 className="page-title">About Developer</h1>
@@ -349,8 +343,7 @@ const App: React.FC = () => {
             <div className="dev-card premium-shadow">
               <div className="dev-profile">
                 <div className="dev-avatar">
-                  {/* ✨ REAL PHOTO YAHA LAG RAHI HAI */}
-                  <img src={profileImage} alt="Sahil" className="profile-image" />
+                  <img src="/profile.jpg" alt="Sahil" className="profile-image" />
                 </div>
                 <div className="dev-details">
                   <h3>Sahil</h3>
@@ -387,7 +380,6 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* ✨ New Centered Calendar Floating Button */}
             <div className="fab-container">
                 <button className="fab-btn haptic-btn" onClick={() => handleNavClick('calendar')}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
@@ -401,7 +393,7 @@ const App: React.FC = () => {
         )}
       </div>
 
-      {/* POPUP MODAL (No changes here) */}
+      {/* POPUP MODAL */}
       {selectedHoliday && (
         <div className="modal-overlay" onClick={() => { triggerHaptic(); setSelectedHoliday(null); }}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -435,7 +427,7 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* BOTTOM NAVIGATION (No changes here) */}
+      {/* BOTTOM NAVIGATION */}
       <div className="bottom-nav premium-blur">
         <button className={`nav-item haptic-btn ${view === 'calendar' ? 'active' : ''}`} onClick={() => handleNavClick('calendar')}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
