@@ -2,14 +2,12 @@
    ✨ THE 2026 ULTRA-PREMIUM UI (STABLE) ✨
    ========================================= */
 
-/* Ambient Glowing Background Animation */
 @keyframes ambientGlow {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
-/* Core App Layout */
 .app-container {
   height: 100vh;
   height: 100dvh; 
@@ -33,22 +31,18 @@
   padding: 55px 20px 100px; 
 }
 
-/* Animations */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
 .animation-fade-in { animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; will-change: opacity, transform; }
 .animation-slide-up { animation: fadeIn 0.5s ease-out forwards; opacity: 0; }
 
-/* Visual Haptics */
 .haptic-btn { transition: transform 0.1s ease, opacity 0.1s ease; cursor: pointer; }
 .haptic-btn:active { transform: scale(0.94) !important; opacity: 0.8; }
 
-/* Header Elements */
 .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
 .month-title { font-size: 36px; font-weight: 800; margin: 0; letter-spacing: -1px; text-shadow: 0 4px 15px rgba(255,255,255,0.8); }
 .year-title { font-size: 22px; color: #0056b3; margin: 0; font-weight: 800; }
 
-/* Glass Controls for Calendar */
 .controls { display: flex; gap: 10px; align-items: center; }
 .theme-toggle { background: rgba(255, 255, 255, 0.7); border: 1px solid #ffffff; backdrop-filter: blur(12px); border-radius: 50%; width: 42px; height: 42px; font-size: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
 .country-select {
@@ -57,7 +51,6 @@
   box-shadow: 0 4px 15px rgba(0,0,0,0.05); outline: none; max-width: 110px;
 }
 
-/* Calendar Grid */
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
 .day-name { font-size: 12px; font-weight: 800; color: #4b5563; margin-bottom: 15px; }
 .calendar-day {
@@ -69,19 +62,53 @@
 .calendar-day.today { background-color: rgba(255, 255, 255, 0.9); color: #007aff; font-weight: 900; border: 2px solid #007aff; box-shadow: 0 0 20px rgba(0, 122, 255, 0.4); }
 .calendar-day.holiday { background: linear-gradient(135deg, #007aff, #0056b3); color: white; font-weight: 800; box-shadow: 0 8px 25px rgba(0, 122, 255, 0.5); border: none; }
 
-/* Agenda Items */
+/* =========================================
+   ✅ OVERLAP FIX: AGENDA ITEMS
+   ========================================= */
+
 .agenda-item { 
   display: flex; align-items: center; background: rgba(255, 255, 255, 0.7); 
   backdrop-filter: blur(16px); border: 1px solid #ffffff; padding: 18px; border-radius: 24px; 
   margin-bottom: 15px; box-shadow: 0 10px 30px rgba(31, 38, 135, 0.05); position: relative; 
 }
+
 .agenda-date { background: rgba(0, 122, 255, 0.1); color: #007aff; border-radius: 18px; min-width: 65px; height: 65px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-right: 18px; }
 .agenda-day { font-size: 24px; font-weight: 800; line-height: 1; }
 .agenda-month { font-size: 12px; font-weight: 800; text-transform: uppercase; }
-.agenda-details strong { font-size: 18px; font-weight: 800; color: #1c1c1e; }
-.agenda-details p { margin: 4px 0 0 0; font-size: 14px; color: #4b5563; }
-.countdown-badge { display: inline-block; font-size: 12px; font-weight: 800; color: #ea580c; background: rgba(234, 88, 12, 0.1); padding: 5px 12px; border-radius: 12px; margin-top: 8px; }
-.zodiac-badge { position: absolute; right: 18px; top: 18px; font-size: 18px; background: rgba(168, 85, 247, 0.1); padding: 6px; border-radius: 12px; color: #a855f7; }
+
+.agenda-details { flex: 1; }
+.agenda-details strong { font-size: 18px; font-weight: 800; color: #1c1c1e; display: block; margin-bottom: 4px; }
+.agenda-details p { margin: 0; font-size: 14px; color: #4b5563; }
+
+/* Nayi wrapper class dono badges ke liye taaki line break theek se ho */
+.badge-row { 
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 8px; 
+  margin-top: 10px; 
+}
+
+.countdown-badge { 
+  display: inline-block; 
+  font-size: 12px; 
+  font-weight: 800; 
+  color: #ea580c; 
+  background: rgba(234, 88, 12, 0.1); 
+  padding: 5px 12px; 
+  border-radius: 12px; 
+}
+
+/* Yahan se 'position: absolute' hataya aur inline box banaya gaya hai */
+.zodiac-badge { 
+  display: inline-block; 
+  font-size: 12px; 
+  font-weight: 800; 
+  color: #a855f7; 
+  background: rgba(168, 85, 247, 0.1); 
+  padding: 5px 12px; 
+  border-radius: 12px; 
+}
+
 
 /* Search Bar */
 .search-bar { 
@@ -100,10 +127,7 @@
 .share-btn { padding: 18px 20px; background: linear-gradient(135deg, #25D366, #128C7E); color: white; border: none; border-radius: 20px; font-size: 18px; font-weight: 800; box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4); width: 120px; }
 .modal-close-btn { padding: 18px; background: linear-gradient(135deg, #007aff, #0056b3); color: white; border: none; border-radius: 20px; font-size: 18px; font-weight: 800; box-shadow: 0 8px 25px rgba(0, 122, 255, 0.4); flex: 1; }
 
-/* =========================================
-   ✨ UPDATED ABOUT SECTION CARD ✨
-   ========================================= */
-
+/* About Section Card */
 .dev-card { 
   padding: 30px; 
   border-radius: 35px; 
@@ -118,7 +142,6 @@
   margin-bottom: 35px; 
 }
 
-/* Photo Wrapper */
 .dev-avatar { 
   width: 90px; 
   height: 90px; 
@@ -129,7 +152,6 @@
   display: block;
 }
 
-/* Image inside Wrapper */
 .profile-image {
   width: 100%;
   height: 100%;
@@ -174,7 +196,6 @@
 .link-text strong { font-size: 16px; color: #1c1c1e; font-weight: 600; margin-top: 2px; }
 .link-arrow { font-size: 24px; color: #c7c7cc; font-weight: 300; }
 
-/* 🌟 Floating Center Button for About Screen */
 .fab-container {
     display: flex;
     justify-content: center;
@@ -227,12 +248,10 @@
   border: 1px solid rgba(255,255,255,0.05);
 }
 .dark-mode .dev-details h3, 
-.dark-mode .link-text strong { color: #ffffff; }
+.dark-mode .link-text strong,
+.dark-mode .agenda-details strong { color: #ffffff; }
 
-/* =========================================
-   ✨ FAIL-SAFE SWIPE ANIMATIONS
-   ========================================= */
-
+/* Animations */
 .calendar-anim-wrapper {
   animation-duration: 0.35s;
   animation-fill-mode: forwards;
