@@ -91,3 +91,57 @@
 .fun-fact-box p { color: #555; }
 .astrology-box { background: #fdf5ff; padding: 20px; border-radius: 20px; margin-bottom: 30px; border-left: 5px solid #a020f0; }
 .astrology-box p { color: #555; }
+
+/* Share & Close Buttons (NEW) */
+.share-btn { padding: 16px 20px; background: #25D366; color: white; border: none; border-radius: 16px; font-size: 18px; font-weight: 700; box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3); cursor: pointer; transition: 0.2s; }
+.share-btn:active { transform: scale(0.96); }
+.modal-close-btn { padding: 16px; background: #007aff; color: white; border: none; border-radius: 16px; font-size: 18px; font-weight: 700; box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3); cursor: pointer; transition: 0.2s; }
+.modal-close-btn:active { transform: scale(0.96); }
+
+/* About View */
+.premium-shadow { box-shadow: 0 10px 30px rgba(0,0,0,0.08); background: white; }
+.logo-placeholder { width: 100px; height: 100px; background: linear-gradient(135deg, #007aff, #00b4db); border-radius: 30px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
+.app-name-title { text-align: center; margin: 20px 0 5px; font-size: 24px; font-weight: 800; }
+.version-text { text-align: center; color: #8e8e93; font-size: 13px; font-weight: 700; letter-spacing: 1px; }
+.dev-card { padding: 25px; border-radius: 25px; margin: 30px 0; }
+.dev-icon { width: 45px; height: 45px; border-radius: 12px; background: #e1f0ff; color: #007aff; display: flex; align-items: center; justify-content: center; margin-right: 15px; }
+.dev-info-row { margin: 12px 0; font-size: 15px; font-weight: 500; display: flex; align-items: center; }
+.emoji { margin-right: 10px; font-size: 18px; }
+
+/* Bottom Nav */
+.bottom-nav { height: 85px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(0,0,0,0.05); background: rgba(255, 255, 255, 0.85); backdrop-filter: saturate(180%) blur(20px); flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom, 10px); transition: background 0.3s ease; }
+.nav-item { display: flex; flex-direction: column; align-items: center; background: none; border: none; color: #8e8e93; cursor: pointer; }
+.nav-icon { stroke: #8e8e93; margin-bottom: 4px; transition: all 0.2s ease; }
+.nav-item span { font-size: 11px; font-weight: 600; }
+.nav-item.active { color: #007aff; }
+.nav-item.active .nav-icon { stroke: #007aff; transform: scale(1.1); }
+
+/* =========================================
+   🌙 DARK MODE MAGIC (Ekdum Premium Black)
+   ========================================= */
+.app-container.dark-mode { background-color: #000000; color: #ffffff; }
+.dark-mode .month-title, .dark-mode .page-title, .dark-mode .modal-title, .dark-mode .app-name-title, .dark-mode .dev-name { color: #ffffff; }
+.dark-mode .calendar-day { color: #ffffff; }
+.dark-mode .country-select, .dark-mode .nav-arrows, .dark-mode .search-bar { background: #1c1c1e; color: #0a84ff; box-shadow: none; }
+.dark-mode .search-bar { color: #ffffff; }
+.dark-mode .search-bar::placeholder { color: #8e8e93; }
+
+/* Cards & Modals */
+.dark-mode .agenda-item, .dark-mode .dev-card, .dark-mode .modal-content { background: #1c1c1e; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+.dark-mode .agenda-date { background: #2c2c2e; color: #0a84ff; }
+.dark-mode .fun-fact-box { background: #2c2c2e; border-left-color: #0a84ff; }
+.dark-mode .fun-fact-box p { color: #d1d1d6; }
+.dark-mode .astrology-box { background: #2c2c2e; border-left-color: #bf5af2; }
+.dark-mode .astrology-box p { color: #d1d1d6; }
+.dark-mode .zodiac-badge { background: #2c2c2e; color: #bf5af2; }
+
+/* Countdown Dark */
+.dark-mode .countdown-badge { background: #332715; color: #ff9d0a; }
+.dark-mode .countdown-badge.passed { background: #2c2c2e; color: #8e8e93; }
+
+/* Bottom Nav Dark */
+.dark-mode .bottom-nav { background: rgba(28, 28, 30, 0.85); border-top: 1px solid rgba(255,255,255,0.05); }
+
+/* Fix Today Outline in Dark Mode */
+.dark-mode .calendar-day.today { background: #1c2836; color: #0a84ff; border-color: #0a84ff; }
+.dark-mode .calendar-day.today.holiday { box-shadow: 0 0 0 3px #000000, 0 0 0 5px #0a84ff, 0 6px 14px rgba(0, 122, 255, 0.3); }
