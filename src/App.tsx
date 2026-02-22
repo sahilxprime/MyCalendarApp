@@ -4,48 +4,99 @@ import './App.css';
 const App: React.FC = () => {
   const [view, setView] = useState('calendar');
   const [holidays, setHolidays] = useState<any[]>([]);
-  const [country, setCountry] = useState('IN'); // Default India
+  const [country, setCountry] = useState('IN'); 
   const [availableCountries, setAvailableCountries] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [currentMonth, setCurrentMonth] = useState(0); // 0 = January
-  const [selectedHoliday, setSelectedHoliday] = useState<any | null>(null); // Popup ke liye
+  const [currentMonth, setCurrentMonth] = useState(0); 
+  const [selectedHoliday, setSelectedHoliday] = useState<any | null>(null); 
   const year = 2026;
 
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-  // Fetch Countries & Pin India to Top
+  // 🌟 CUSTOM ASIAN COUNTRIES (Kyunki public API mein ye nahi hote)
+  const asianCountries = [
+    { countryCode: 'IN', name: 'India' },
+    { countryCode: 'PK', name: 'Pakistan' },
+    { countryCode: 'NP', name: 'Nepal' },
+    { countryCode: 'BT', name: 'Bhutan' },
+    { countryCode: 'BD', name: 'Bangladesh' },
+    { countryCode: 'LK', name: 'Sri Lanka' }
+  ];
+
+  const customHolidays: { [key: string]: any[] } = {
+    'IN': [
+      { date: '2026-01-01', localName: 'New Year', name: 'New Year\'s Day' },
+      { date: '2026-01-26', localName: 'Republic Day', name: 'Republic Day' },
+      { date: '2026-03-03', localName: 'Holi', name: 'Festival of Colors' },
+      { date: '2026-03-20', localName: 'Eid al-Fitr', name: 'End of Ramadan' },
+      { date: '2026-04-03', localName: 'Good Friday', name: 'Good Friday' },
+      { date: '2026-08-15', localName: 'Independence Day', name: 'Independence Day' },
+      { date: '2026-10-02', localName: 'Gandhi Jayanti', name: 'Mahatma Gandhi\'s Birthday' },
+      { date: '2026-11-08', localName: 'Diwali', name: 'Festival of Lights' },
+      { date: '2026-12-25', localName: 'Christmas Day', name: 'Christmas Day' }
+    ],
+    'PK': [
+      { date: '2026-02-05', localName: 'Kashmir Day', name: 'Kashmir Solidarity Day' },
+      { date: '2026-03-23', localName: 'Pakistan Day', name: 'Pakistan Day' },
+      { date: '2026-04-20', localName: 'Eid-ul-Fitr', name: 'Eid-ul-Fitr' },
+      { date: '2026-08-14', localName: 'Independence Day', name: 'Independence Day' },
+      { date: '2026-12-25', localName: 'Quaid-e-Azam Day', name: 'Quaid-e-Azam Day' }
+    ],
+    'NP': [
+      { date: '2026-02-18', localName: 'Democracy Day', name: 'Democracy Day' },
+      { date: '2026-04-14', localName: 'Nepali New Year', name: 'Nepali New Year' },
+      { date: '2026-09-19', localName: 'Constitution Day', name: 'Constitution Day' }
+    ],
+    'BT': [
+      { date: '2026-02-21', localName: 'King\'s Birthday', name: 'King\'s Birthday' },
+      { date: '2026-12-17', localName: 'National Day', name: 'National Day' }
+    ]
+  };
+
   useEffect(() => {
     const fetchCountries = async () => {
       try {
         const response = await fetch('https://date.nager.at/api/v3/AvailableCountries');
-        const data = await response.json();
+        const apiData = await response.json();
         
-        // India ko hamesha top par rakhne ka logic
-        const sortedData = data.sort((a: any, b: any) => {
+        // Merge API countries with our Custom Asian Countries
+        const mergedData = [...apiData, ...asianCountries];
+
+        // Ensure India is at the very top, followed by alphabetical order
+        const sortedData = mergedData.sort((a: any, b: any) => {
           if (a.countryCode === 'IN') return -1;
           if (b.countryCode === 'IN') return 1;
           return a.name.localeCompare(b.name);
         });
         
-        setAvailableCountries(sortedData);
+        // Remove duplicates if any
+        const uniqueData = sortedData.filter((v,i,a)=>a.findIndex(v2=>(v2.countryCode===v.countryCode))===i);
+        setAvailableCountries(uniqueData);
       } catch (error) {
-        console.error("Error fetching countries", error);
+        setAvailableCountries(asianCountries);
       }
     };
     fetchCountries();
   }, []);
 
-  // Fetch Holidays
   useEffect(() => {
     const fetchHolidays = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`https://date.nager.at/api/v3/PublicHolidays/2026/${country}`);
-        const data = await response.json();
-        setHolidays(data);
+        if (customHolidays[country]) {
+          setHolidays(customHolidays[country]);
+        } else {
+          const response = await fetch(`https://date.nager.at/api/v3/PublicHolidays/2026/${country}`);
+          if (response.ok) {
+            const data = await response.json();
+            setHolidays(data);
+          } else {
+            setHolidays([]);
+          }
+        }
       } catch (error) {
-        console.error("Error fetching holidays", error);
+        setHolidays([]);
       } finally {
         setLoading(false);
       }
@@ -53,19 +104,15 @@ const App: React.FC = () => {
     if (country) fetchHolidays();
   }, [country]);
 
-  // Calendar Logic
   const daysInMonth = new Date(year, currentMonth + 1, 0).getDate();
   const firstDay = new Date(year, currentMonth, 1).getDay();
 
   const prevMonth = () => setCurrentMonth(prev => Math.max(prev - 1, 0));
   const nextMonth = () => setCurrentMonth(prev => Math.min(prev + 1, 11));
 
-  // Handle Holiday Click
   const handleDayClick = (dateString: string) => {
     const holiday = holidays.find(h => h.date === dateString);
-    if (holiday) {
-      setSelectedHoliday(holiday);
-    }
+    if (holiday) setSelectedHoliday(holiday);
   };
 
   const renderCalendarDays = () => {
@@ -90,7 +137,6 @@ const App: React.FC = () => {
     return days;
   };
 
-  // Format Date for Popup
   const formatDateString = (dateStr: string) => {
     const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateStr).toLocaleDateString('en-US', options);
@@ -152,7 +198,7 @@ const App: React.FC = () => {
                 </div>
               ))
             ) : (
-              <p style={{ textAlign: 'center', color: '#888' }}>No holidays found.</p>
+              <p style={{ textAlign: 'center', color: '#888', marginTop: '50px' }}>No holidays found for this year.</p>
             )}
           </div>
         )}
@@ -160,13 +206,17 @@ const App: React.FC = () => {
         {/* ABOUT VIEW */}
         {view === 'about' && (
           <div className="about-view animation-fade-in">
-            <div className="logo-placeholder premium-shadow">H</div>
+            <div className="logo-placeholder premium-shadow">
+              <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </div>
             <h2 className="app-name-title">Holiday 2026</h2>
             <p className="version-text">VERSION 1.0.0 PRO</p>
             
             <div className="dev-card premium-shadow">
               <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-                <div className="dev-icon">&lt;/&gt;</div>
+                <div className="dev-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5c-1.3 0-2.4.9-2.9 2.1"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
+                </div>
                 <div>
                   <h3 style={{ margin: 0, color: '#1c1c1e', fontSize: '20px' }}>Sahil</h3>
                   <p style={{ margin: 0, fontSize: '14px', color: '#8e8e93' }}>Lead iOS Developer</p>
@@ -180,7 +230,7 @@ const App: React.FC = () => {
         )}
       </div>
 
-      {/* iOS STYLE BOTTOM SHEET MODAL (POPUP) */}
+      {/* POPUP MODAL */}
       {selectedHoliday && (
         <div className="modal-overlay" onClick={() => setSelectedHoliday(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -202,18 +252,18 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* BOTTOM NAVIGATION */}
+      {/* 🌟 PRO BOTTOM NAVIGATION WITH iOS SVG ICONS */}
       <div className="bottom-nav premium-blur">
         <button className={`nav-item ${view === 'calendar' ? 'active' : ''}`} onClick={() => setView('calendar')}>
-          <span className="nav-icon">📅</span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
           <span>Calendar</span>
         </button>
         <button className={`nav-item ${view === 'agenda' ? 'active' : ''}`} onClick={() => setView('agenda')}>
-          <span className="nav-icon">📋</span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
           <span>Agenda</span>
         </button>
         <button className={`nav-item ${view === 'about' ? 'active' : ''}`} onClick={() => setView('about')}>
-          <span className="nav-icon">ℹ️</span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
           <span>About</span>
         </button>
       </div>
