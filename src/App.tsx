@@ -99,4 +99,311 @@ const App: React.FC = () => {
       { date: '2026-10-01', localName: 'Dussehra Mahanavami', name: 'Dussehra Mahanavami' },
       { date: '2026-10-02', localName: 'Gandhi Jayanti', name: 'Gandhi Jayanti' },
       { date: '2026-10-02', localName: 'Vijayadashami', name: 'Vijayadashami' },
-      { date: '2026-10-20', localName: 'Diwali', name: 'Diwali (
+      { date: '2026-10-20', localName: 'Diwali', name: 'Diwali (Deepavali)' },
+      { date: '2026-10-21', localName: 'Govardhan Puja', name: 'Diwali (Day 2)' },
+      { date: '2026-10-22', localName: 'Bhaiya Dooj', name: 'Bhaiya Dooj' },
+      { date: '2026-11-05', localName: 'Guru Nanak Jayanti', name: 'Guru Nanak Jayanti' },
+      { date: '2026-11-24', localName: 'Guru Nanak\'s Birthday', name: 'Guru Nanak\'s Birthday (Alt)' },
+      { date: '2026-12-25', localName: 'Christmas Day', name: 'Christmas Day' },
+      { date: '2026-12-31', localName: 'New Year\'s Eve', name: 'New Year\'s Eve' }
+    ]
+  };
+
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const response = await fetch('https://date.nager.at/api/v3/AvailableCountries');
+        const apiData = await response.json();
+        const mergedData = [...apiData, ...asianCountries];
+        const sortedData = mergedData.sort((a: any, b: any) => {
+          if (a.countryCode === 'IN') return -1;
+          if (b.countryCode === 'IN') return 1;
+          return a.name.localeCompare(b.name);
+        });
+        const uniqueData = sortedData.filter((v,i,a)=>a.findIndex(v2=>(v2.countryCode===v.countryCode))===i);
+        setAvailableCountries(uniqueData);
+      } catch (error) {
+        setAvailableCountries(asianCountries);
+      }
+    };
+    fetchCountries();
+  }, []);
+
+  useEffect(() => {
+    const fetchHolidays = async () => {
+      setLoading(true);
+      try {
+        if (customHolidays[country]) {
+          setHolidays(customHolidays[country]);
+        } else {
+          const response = await fetch(`https://date.nager.at/api/v3/PublicHolidays/2026/${country}`);
+          if (response.ok) {
+            const data = await response.json();
+            setHolidays(data);
+          } else {
+            setHolidays([]);
+          }
+        }
+      } catch (error) {
+        setHolidays([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (country) fetchHolidays();
+  }, [country]);
+
+  const prevMonth = () => { triggerHaptic(); setCurrentMonth(prev => Math.max(prev - 1, 0)); };
+  const nextMonth = () => { triggerHaptic(); setCurrentMonth(prev => Math.min(prev + 1, 11)); };
+
+  const handleDayClick = (dateString: string) => {
+    triggerHaptic();
+    const holiday = holidays.find(h => h.date === dateString);
+    if (holiday) setSelectedHoliday(holiday);
+  };
+
+  const handleNavClick = (newView: string) => {
+    triggerHaptic();
+    setView(newView);
+  };
+
+  const handleShare = () => {
+    triggerHaptic();
+    const shareText = `Hey! 🗓️ ${selectedHoliday.localName} is on ${formatDateString(selectedHoliday.date)}. It's a ${getZodiacSign(selectedHoliday.date)} day! Let's celebrate! 🚀`;
+    if (navigator.share) {
+      navigator.share({ title: selectedHoliday.localName, text: shareText });
+    } else {
+      window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`);
+    }
+  };
+
+  // ✅ LOGIC FIX: Render Calendar Days explicitly handling Keys to fix the March bug
+  const renderCalendarDays = () => {
+    let days = [];
+    const realToday = new Date(); 
+    
+    // Calculate fresh for current render
+    const currentFirstDay = new Date(year, currentMonth, 1).getDay();
+    const currentDaysInMonth = new Date(year, currentMonth + 1, 0).getDate();
+
+    for (let i = 0; i < currentFirstDay; i++) {
+      // Month added to key so React forces a clean redraw
+      days.push(<div key={`empty-${currentMonth}-${i}`} className="calendar-day empty"></div>);
+    }
+    for (let i = 1; i <= currentDaysInMonth; i++) {
+      const dateString = `${year}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+      const isHoliday = holidays.some(h => h.date === dateString);
+      const isToday = realToday.getFullYear() === year && realToday.getMonth() === currentMonth && realToday.getDate() === i;
+      
+      days.push(
+        <div 
+          key={`day-${currentMonth}-${i}`} 
+          className={`calendar-day ${isHoliday ? 'holiday' : ''} ${isToday ? 'today' : ''} haptic-btn`}
+          onClick={() => isHoliday ? handleDayClick(dateString) : null}
+        >
+          {i}
+        </div>
+      );
+    }
+    return days;
+  };
+
+  const formatDateString = (dateStr: string) => {
+    const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateStr).toLocaleDateString('en-US', options);
+  };
+
+  const filteredHolidays = holidays.filter(h => 
+    h.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    h.localName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div className={`app-container ${isDarkMode ? 'dark-mode' : ''}`}>
+      <div className="main-content">
+        
+        {/* CALENDAR VIEW */}
+        {view === 'calendar' && (
+          <div className="calendar-view animation-fade-in">
+            <div className="calendar-header">
+              <div>
+                <h1 className="month-title">{months[currentMonth]}</h1>
+                <h2 className="year-title">{year}</h2>
+              </div>
+              <div className="controls">
+                <button className="theme-toggle haptic-btn" onClick={() => { triggerHaptic(); setIsDarkMode(!isDarkMode); }}>
+                  {isDarkMode ? '☀️' : '🌙'}
+                </button>
+                <select className="country-select haptic-btn" value={country} onChange={(e) => { triggerHaptic(); setCountry(e.target.value); }}>
+                  {availableCountries.map((c) => (
+                    <option key={c.countryCode} value={c.countryCode}>
+                      {c.countryCode === 'IN' ? '🇮🇳 India' : c.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="nav-arrows">
+                  <button className="haptic-btn" onClick={prevMonth}>&lt;</button>
+                  <button className="haptic-btn" onClick={nextMonth}>&gt;</button>
+                </div>
+              </div>
+            </div>
+
+            <div className="calendar-grid">
+              {daysOfWeek.map(day => (
+                <div key={day} className="day-name">{day}</div>
+              ))}
+              {renderCalendarDays()}
+            </div>
+          </div>
+        )}
+
+        {/* AGENDA VIEW */}
+        {view === 'agenda' && (
+          <div className="agenda-view animation-fade-in">
+            <h1 className="page-title">Upcoming Holidays</h1>
+            
+            <input 
+              type="text" 
+              className="search-bar" 
+              placeholder="Search holidays... (e.g. Diwali)" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+
+            {loading ? (
+              <div className="loading-spinner"></div>
+            ) : filteredHolidays.length > 0 ? (
+              filteredHolidays.map((h: any, index: number) => (
+                <div key={index} className="agenda-item animation-slide-up haptic-btn" style={{ animationDelay: `${index * 0.05}s` }} onClick={() => handleDayClick(h.date)}>
+                  <div className="agenda-date">
+                    <span className="agenda-day">{new Date(h.date).getDate()}</span>
+                    <span className="agenda-month">{months[new Date(h.date).getMonth()].substring(0,3)}</span>
+                  </div>
+                  <div className="agenda-details">
+                    <strong>{h.localName}</strong>
+                    <p>{h.name}</p>
+                    <span className={`countdown-badge ${getDaysLeft(h.date) === 'Passed' ? 'passed' : ''}`}>
+                      {getDaysLeft(h.date)}
+                    </span>
+                    <span className="zodiac-badge">{getZodiacSign(h.date)}</span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p style={{ textAlign: 'center', color: '#888', marginTop: '50px' }}>No holidays found.</p>
+            )}
+          </div>
+        )}
+
+        {/* ABOUT VIEW - 🌟 PREMIUM iOS REDESIGN & CLICKABLE LINKS */}
+        {view === 'about' && (
+          <div className="about-view animation-fade-in">
+            <h1 className="page-title">About Developer</h1>
+            
+            <div className="dev-card premium-shadow">
+              <div className="dev-profile">
+                <div className="dev-avatar">
+                  <span style={{ fontSize: '30px' }}>👨‍💻</span>
+                </div>
+                <div className="dev-details">
+                  <h3>Sahil</h3>
+                  <p>Lead iOS Developer</p>
+                </div>
+              </div>
+              
+              <div className="dev-links">
+                {/* Clickable Instagram */}
+                <a href="https://instagram.com/primexsahil" target="_blank" rel="noreferrer" className="dev-link-item haptic-btn" onClick={triggerHaptic}>
+                  <div className="link-icon insta-gradient">📸</div>
+                  <div className="link-text">
+                    <span>Instagram</span>
+                    <strong>@primexsahil</strong>
+                  </div>
+                  <div className="link-arrow">›</div>
+                </a>
+
+                {/* Clickable Email */}
+                <a href="mailto:primexsahil45@gmail.com" className="dev-link-item haptic-btn" onClick={triggerHaptic}>
+                  <div className="link-icon email-gradient">📧</div>
+                  <div className="link-text">
+                    <span>Email Me</span>
+                    <strong>primexsahil45@gmail.com</strong>
+                  </div>
+                  <div className="link-arrow">›</div>
+                </a>
+
+                {/* Location */}
+                <div className="dev-link-item haptic-btn" onClick={triggerHaptic}>
+                  <div className="link-icon location-gradient">📍</div>
+                  <div className="link-text">
+                    <span>Location</span>
+                    <strong>Shimla, HP</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: '30px' }}>
+              <div className="logo-placeholder premium-shadow" style={{ width: 60, height: 60, fontSize: 24, margin: '0 auto' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              </div>
+              <p className="version-text" style={{ marginTop: '10px' }}>HOLIDAY 2026 • VERSION 1.0.0 PRO</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* POPUP MODAL */}
+      {selectedHoliday && (
+        <div className="modal-overlay" onClick={() => { triggerHaptic(); setSelectedHoliday(null); }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-handle"></div>
+            <h2 className="modal-title">{selectedHoliday.localName}</h2>
+            <p className="modal-date-text">🗓️ {formatDateString(selectedHoliday.date)}</p>
+            
+            <div className="fun-fact-box">
+              <h4 style={{ margin: '0 0 5px 0', color: '#007aff' }}>✨ Holiday Info</h4>
+              <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5' }}>
+                {selectedHoliday.name} is a major public holiday. It is <strong>{getDaysLeft(selectedHoliday.date)}</strong>!
+              </p>
+            </div>
+
+            <div className="astrology-box">
+              <h4 style={{ margin: '0 0 5px 0', color: '#a020f0' }}>🔮 Astrology Insight</h4>
+              <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5' }}>
+                Zodiac Sign for this day: <strong>{getZodiacSign(selectedHoliday.date)}</strong>
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button className="share-btn haptic-btn" onClick={handleShare}>
+                📲 Share
+              </button>
+              <button className="modal-close-btn haptic-btn" style={{ flex: 1 }} onClick={() => { triggerHaptic(); setSelectedHoliday(null); }}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* BOTTOM NAVIGATION */}
+      <div className="bottom-nav premium-blur">
+        <button className={`nav-item haptic-btn ${view === 'calendar' ? 'active' : ''}`} onClick={() => handleNavClick('calendar')}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          <span>Calendar</span>
+        </button>
+        <button className={`nav-item haptic-btn ${view === 'agenda' ? 'active' : ''}`} onClick={() => handleNavClick('agenda')}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+          <span>Agenda</span>
+        </button>
+        <button className={`nav-item haptic-btn ${view === 'about' ? 'active' : ''}`} onClick={() => handleNavClick('about')}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span>About</span>
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default App;
