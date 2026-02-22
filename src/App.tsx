@@ -231,4 +231,151 @@ const App: React.FC = () => {
               </div>
               <div className="controls">
                 {/* 🌙 Theme Toggle Button */}
-                <button className="theme-toggle" onClick={() =>
+                <button className="theme-toggle" onClick={() => { triggerHaptic(); setIsDarkMode(!isDarkMode); }}>
+                  {isDarkMode ? '☀️' : '🌙'}
+                </button>
+                <select className="country-select" value={country} onChange={(e) => { triggerHaptic(); setCountry(e.target.value); }}>
+                  {availableCountries.map((c) => (
+                    <option key={c.countryCode} value={c.countryCode}>
+                      {c.countryCode === 'IN' ? '🇮🇳 India' : c.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="nav-arrows">
+                  <button onClick={prevMonth}>&lt;</button>
+                  <button onClick={nextMonth}>&gt;</button>
+                </div>
+              </div>
+            </div>
+
+            <div className="calendar-grid">
+              {daysOfWeek.map(day => (
+                <div key={day} className="day-name">{day}</div>
+              ))}
+              {renderCalendarDays()}
+            </div>
+          </div>
+        )}
+
+        {/* AGENDA VIEW */}
+        {view === 'agenda' && (
+          <div className="agenda-view animation-fade-in">
+            <h1 className="page-title">Upcoming Holidays</h1>
+            
+            {/* 🔍 Search Bar */}
+            <input 
+              type="text" 
+              className="search-bar" 
+              placeholder="Search holidays... (e.g. Diwali)" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+
+            {loading ? (
+              <div className="loading-spinner"></div>
+            ) : filteredHolidays.length > 0 ? (
+              filteredHolidays.map((h: any, index: number) => (
+                <div key={index} className="agenda-item animation-slide-up" style={{ animationDelay: `${index * 0.05}s` }}>
+                  <div className="agenda-date">
+                    <span className="agenda-day">{new Date(h.date).getDate()}</span>
+                    <span className="agenda-month">{months[new Date(h.date).getMonth()].substring(0,3)}</span>
+                  </div>
+                  <div className="agenda-details">
+                    <strong>{h.localName}</strong>
+                    <p>{h.name}</p>
+                    {/* ⏳ Countdown Timer Badge */}
+                    <span className={`countdown-badge ${getDaysLeft(h.date) === 'Passed' ? 'passed' : ''}`}>
+                      {getDaysLeft(h.date)}
+                    </span>
+                    <span className="zodiac-badge">{getZodiacSign(h.date)}</span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p style={{ textAlign: 'center', color: '#888', marginTop: '50px' }}>No holidays found.</p>
+            )}
+          </div>
+        )}
+
+        {/* ABOUT VIEW */}
+        {view === 'about' && (
+          <div className="about-view animation-fade-in">
+            <div className="logo-placeholder premium-shadow">
+              <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </div>
+            <h2 className="app-name-title">Holiday 2026</h2>
+            <p className="version-text">VERSION 1.0.0 PRO</p>
+            
+            <div className="dev-card premium-shadow">
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                <div className="dev-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5c-1.3 0-2.4.9-2.9 2.1"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '20px' }} className="dev-name">Sahil</h3>
+                  <p style={{ margin: 0, fontSize: '14px', color: '#8e8e93' }}>Lead iOS Developer</p>
+                </div>
+              </div>
+              <div className="dev-info-row"><span className="emoji">📸</span> @primexsahil</div>
+              <div className="dev-info-row"><span className="emoji">📧</span> primexsahil45@gmail.com</div>
+              <div className="dev-info-row"><span className="emoji">📍</span> Shimla, HP</div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* POPUP MODAL */}
+      {selectedHoliday && (
+        <div className="modal-overlay" onClick={() => { triggerHaptic(); setSelectedHoliday(null); }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-handle"></div>
+            <h2 className="modal-title">{selectedHoliday.localName}</h2>
+            <p className="modal-date-text">🗓️ {formatDateString(selectedHoliday.date)}</p>
+            
+            <div className="fun-fact-box">
+              <h4 style={{ margin: '0 0 5px 0', color: '#007aff' }}>✨ Holiday Info</h4>
+              <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5' }}>
+                {selectedHoliday.name} is a major public holiday. It is <strong>{getDaysLeft(selectedHoliday.date)}</strong>!
+              </p>
+            </div>
+
+            <div className="astrology-box">
+              <h4 style={{ margin: '0 0 5px 0', color: '#a020f0' }}>🔮 Astrology Insight</h4>
+              <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5' }}>
+                Zodiac Sign for this day: <strong>{getZodiacSign(selectedHoliday.date)}</strong>
+              </p>
+            </div>
+
+            {/* 📲 NEW: Share to WhatsApp / Native Share */}
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button className="share-btn" onClick={handleShare}>
+                📲 Share
+              </button>
+              <button className="modal-close-btn" style={{ flex: 1 }} onClick={() => { triggerHaptic(); setSelectedHoliday(null); }}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* BOTTOM NAVIGATION */}
+      <div className="bottom-nav premium-blur">
+        <button className={`nav-item ${view === 'calendar' ? 'active' : ''}`} onClick={() => handleNavClick('calendar')}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          <span>Calendar</span>
+        </button>
+        <button className={`nav-item ${view === 'agenda' ? 'active' : ''}`} onClick={() => handleNavClick('agenda')}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+          <span>Agenda</span>
+        </button>
+        <button className={`nav-item ${view === 'about' ? 'active' : ''}`} onClick={() => handleNavClick('about')}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span>About</span>
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default App;
