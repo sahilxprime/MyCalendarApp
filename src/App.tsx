@@ -13,7 +13,7 @@ const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
-  // ✨ Naya Animation State
+  // ✨ Naya Safe Animation State
   const [slideDirection, setSlideDirection] = useState('fade'); 
   const year = 2026;
 
@@ -36,16 +36,15 @@ const App: React.FC = () => {
   const onTouchEnd = () => {
     if (!touchStartX.current || !touchEndX.current) return;
     const distance = touchStartX.current - touchEndX.current;
-    const minSwipeDistance = 50; 
+    const minSwipeDistance = 50; // Minimum distance to trigger swipe
 
     if (distance > minSwipeDistance) {
-      triggerNextMonth(); // Swipe Left
+      triggerNextMonth(); // Swipe Left (Next Month)
     } else if (distance < -minSwipeDistance) {
-      triggerPrevMonth(); // Swipe Right
+      triggerPrevMonth(); // Swipe Right (Previous Month)
     }
   };
 
-  // ✨ Fail-Safe Month Changers
   const triggerNextMonth = () => {
     if (currentMonth >= 11) return;
     triggerHaptic();
@@ -60,11 +59,12 @@ const App: React.FC = () => {
     setCurrentMonth(prev => prev - 1);
   };
 
+  // 📳 Haptic Feedback Logic
   const triggerHaptic = () => {
     try {
       if (navigator.vibrate) navigator.vibrate(40);
     } catch (e) {
-      console.log("Haptic blocked");
+      console.log("Haptic blocked by device");
     }
   };
 
@@ -112,12 +112,43 @@ const App: React.FC = () => {
     'IN': [
       { date: '2026-01-01', localName: 'New Year\'s Day', name: 'New Year\'s Day' },
       { date: '2026-01-14', localName: 'Makar Sankranti', name: 'Makar Sankranti/Pongal/Magh Bihu' },
+      { date: '2026-01-23', localName: 'Vasant Panchami', name: 'Vasant Panchami/Subhas Chandra Bose' },
       { date: '2026-01-26', localName: 'Republic Day', name: 'Republic Day' },
+      { date: '2026-01-30', localName: 'Gandhi Punyatithi', name: 'Gandhi Punyatithi' },
+      { date: '2026-02-01', localName: 'Guru Ravidas Jayanti', name: 'Guru Ravidas Jayanti' },
+      { date: '2026-02-12', localName: 'Maharishi Dayanand', name: 'Maharishi Dayanand Saraswati' },
+      { date: '2026-02-15', localName: 'Maha Shivaratri', name: 'Maha Shivaratri' },
+      { date: '2026-02-19', localName: 'Shivaji Jayanti', name: 'Shivaji Jayanti' },
+      { date: '2026-03-03', localName: 'Holika Dahan', name: 'Holika Dahan/Chhoti Holi' },
       { date: '2026-03-04', localName: 'Holi', name: 'Holi' },
+      { date: '2026-03-20', localName: 'Eid al-Fitr', name: 'Eid al-Fitr (Tentative)' },
+      { date: '2026-03-31', localName: 'Ram Navami', name: 'Ram Navami' },
+      { date: '2026-04-02', localName: 'Mahavir Jayanti', name: 'Mahavir Jayanti' },
+      { date: '2026-04-03', localName: 'Good Friday', name: 'Good Friday' },
+      { date: '2026-04-14', localName: 'Ambedkar Jayanti', name: 'Ambedkar Jayanti' },
+      { date: '2026-05-01', localName: 'Labour Day', name: 'May Day/Labour Day' },
+      { date: '2026-05-12', localName: 'Buddha Purnima', name: 'Buddha Purnima' },
+      { date: '2026-05-28', localName: 'Eid al-Adha', name: 'Eid al-Adha/Bakrid' },
+      { date: '2026-06-26', localName: 'Muharram', name: 'Muharram (Tentative)' },
+      { date: '2026-07-06', localName: 'Ashura', name: 'Muharram/Ashura' },
+      { date: '2026-08-07', localName: 'National Handloom Day', name: 'National Handloom Day' },
       { date: '2026-08-15', localName: 'Independence Day', name: 'Independence Day' },
+      { date: '2026-08-16', localName: 'Janmashtami', name: 'Janmashtami' },
+      { date: '2026-08-26', localName: 'Milad-un-Nabi', name: 'Milad-un-Nabi' },
+      { date: '2026-08-28', localName: 'Raksha Bandhan', name: 'Raksha Bandhan' },
+      { date: '2026-09-04', localName: 'Janmashtami (Alt)', name: 'Janmashtami (Alternative)' },
+      { date: '2026-09-14', localName: 'Ganesh Chaturthi', name: 'Ganesh Chaturthi' },
+      { date: '2026-10-01', localName: 'Dussehra Mahanavami', name: 'Dussehra Mahanavami' },
+      { date: '2026-10-02', localName: 'Gandhi Jayanti', name: 'Gandhi Jayanti' },
+      { date: '2026-10-02', localName: 'Vijayadashami', name: 'Vijayadashami' },
       { date: '2026-10-20', localName: 'Diwali', name: 'Diwali (Deepavali)' },
-      { date: '2026-12-25', localName: 'Christmas Day', name: 'Christmas Day' }
-    ] // Shortened for space, you can paste your full list back here
+      { date: '2026-10-21', localName: 'Govardhan Puja', name: 'Diwali (Day 2)' },
+      { date: '2026-10-22', localName: 'Bhaiya Dooj', name: 'Bhaiya Dooj' },
+      { date: '2026-11-05', localName: 'Guru Nanak Jayanti', name: 'Guru Nanak Jayanti' },
+      { date: '2026-11-24', localName: 'Guru Nanak\'s Birthday', name: 'Guru Nanak\'s Birthday (Alt)' },
+      { date: '2026-12-25', localName: 'Christmas Day', name: 'Christmas Day' },
+      { date: '2026-12-31', localName: 'New Year\'s Eve', name: 'New Year\'s Eve' }
+    ]
   };
 
   useEffect(() => {
@@ -235,7 +266,7 @@ const App: React.FC = () => {
             onTouchEnd={onTouchEnd}
           >
             <div className="calendar-header">
-              {/* ✨ React KEY forces animation without breaking UI */}
+              {/* ✨ Safe Animation Wrapper */}
               <div key={`title-${currentMonth}`} className={`calendar-anim-wrapper ${slideDirection}`}>
                 <h1 className="month-title">{months[currentMonth]}</h1>
                 <h2 className="year-title">{year}</h2>
@@ -254,7 +285,7 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* ✨ React KEY automatically triggers smooth entry */}
+            {/* ✨ Safe Animation Wrapper for Grid */}
             <div key={`grid-${currentMonth}`} className={`calendar-anim-wrapper ${slideDirection}`}>
               <div className="calendar-grid">
                 {daysOfWeek.map(day => (
@@ -266,23 +297,148 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {/* ... (Keep your Agenda and About views exactly as they were) ... */}
+        {/* AGENDA VIEW */}
         {view === 'agenda' && (
-           <div className="agenda-view animation-fade-in">
-             <h1 className="page-title">Upcoming Holidays</h1>
-             <p style={{ textAlign: 'center', color: '#888', marginTop: '50px' }}>Search holidays working.</p>
-           </div>
+          <div className="agenda-view animation-fade-in">
+            <h1 className="page-title">Upcoming Holidays</h1>
+            
+            <input 
+              type="text" 
+              className="search-bar" 
+              placeholder="Search holidays... (e.g. Diwali)" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+
+            {loading ? (
+              <div className="loading-spinner"></div>
+            ) : filteredHolidays.length > 0 ? (
+              filteredHolidays.map((h: any, index: number) => (
+                <div key={index} className="agenda-item animation-slide-up haptic-btn" style={{ animationDelay: `${index * 0.05}s` }} onClick={() => handleDayClick(h.date)}>
+                  <div className="agenda-date">
+                    <span className="agenda-day">{new Date(h.date).getDate()}</span>
+                    <span className="agenda-month">{months[new Date(h.date).getMonth()].substring(0,3)}</span>
+                  </div>
+                  <div className="agenda-details">
+                    <strong>{h.localName}</strong>
+                    <p>{h.name}</p>
+                    <span className={`countdown-badge ${getDaysLeft(h.date) === 'Passed' ? 'passed' : ''}`}>
+                      {getDaysLeft(h.date)}
+                    </span>
+                    <span className="zodiac-badge">{getZodiacSign(h.date)}</span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p style={{ textAlign: 'center', color: '#888', marginTop: '50px' }}>No holidays found.</p>
+            )}
+          </div>
         )}
 
-      </div>
-      
-      {/* ... (Keep Bottom Nav exactly as it was) ... */}
-      <div className="bottom-nav premium-blur">
-        <button className={`nav-item haptic-btn ${view === 'calendar' ? 'active' : ''}`} onClick={() => handleNavClick('calendar')}>
-          <span>Calendar</span>
-        </button>
+        {/* ABOUT VIEW */}
+        {view === 'about' && (
+          <div className="about-view animation-fade-in">
+            <h1 className="page-title">About Developer</h1>
+            
+            <div className="dev-card premium-shadow">
+              <div className="dev-profile">
+                <div className="dev-avatar">
+                  <span style={{ fontSize: '30px' }}>👨‍💻</span>
+                </div>
+                <div className="dev-details">
+                  <h3>Sahil</h3>
+                  <p>Lead iOS Developer</p>
+                </div>
+              </div>
+              
+              <div className="dev-links">
+                <a href="https://instagram.com/primexsahil" target="_blank" rel="noreferrer" className="dev-link-item haptic-btn" onClick={triggerHaptic}>
+                  <div className="link-icon insta-gradient">📸</div>
+                  <div className="link-text">
+                    <span>Instagram</span>
+                    <strong>@primexsahil</strong>
+                  </div>
+                  <div className="link-arrow">›</div>
+                </a>
+
+                <a href="mailto:primexsahil45@gmail.com" className="dev-link-item haptic-btn" onClick={triggerHaptic}>
+                  <div className="link-icon email-gradient">📧</div>
+                  <div className="link-text">
+                    <span>Email Me</span>
+                    <strong>primexsahil45@gmail.com</strong>
+                  </div>
+                  <div className="link-arrow">›</div>
+                </a>
+
+                <div className="dev-link-item haptic-btn" onClick={triggerHaptic}>
+                  <div className="link-icon location-gradient">📍</div>
+                  <div className="link-text">
+                    <span>Location</span>
+                    <strong>Shimla, HP</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: '30px' }}>
+              <div className="logo-placeholder premium-shadow" style={{ width: 60, height: 60, fontSize: 24, margin: '0 auto' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              </div>
+              <p className="version-text" style={{ marginTop: '10px' }}>HOLIDAY 2026 • VERSION 1.0.0 PRO</p>
+            </div>
+          </div>
+        )}
       </div>
 
+      {/* POPUP MODAL */}
+      {selectedHoliday && (
+        <div className="modal-overlay" onClick={() => { triggerHaptic(); setSelectedHoliday(null); }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-handle"></div>
+            <h2 className="modal-title">{selectedHoliday.localName}</h2>
+            <p className="modal-date-text">🗓️ {formatDateString(selectedHoliday.date)}</p>
+            
+            <div className="fun-fact-box">
+              <h4 style={{ margin: '0 0 5px 0', color: '#007aff' }}>✨ Holiday Info</h4>
+              <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5' }}>
+                {selectedHoliday.name} is a major public holiday. It is <strong>{getDaysLeft(selectedHoliday.date)}</strong>!
+              </p>
+            </div>
+
+            <div className="astrology-box">
+              <h4 style={{ margin: '0 0 5px 0', color: '#a020f0' }}>🔮 Astrology Insight</h4>
+              <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5' }}>
+                Zodiac Sign for this day: <strong>{getZodiacSign(selectedHoliday.date)}</strong>
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button className="share-btn haptic-btn" onClick={handleShare}>
+                📲 Share
+              </button>
+              <button className="modal-close-btn haptic-btn" style={{ flex: 1 }} onClick={() => { triggerHaptic(); setSelectedHoliday(null); }}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* BOTTOM NAVIGATION */}
+      <div className="bottom-nav premium-blur">
+        <button className={`nav-item haptic-btn ${view === 'calendar' ? 'active' : ''}`} onClick={() => handleNavClick('calendar')}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          <span>Calendar</span>
+        </button>
+        <button className={`nav-item haptic-btn ${view === 'agenda' ? 'active' : ''}`} onClick={() => handleNavClick('agenda')}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+          <span>Agenda</span>
+        </button>
+        <button className={`nav-item haptic-btn ${view === 'about' ? 'active' : ''}`} onClick={() => handleNavClick('about')}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span>About</span>
+        </button>
+      </div>
     </div>
   );
 };
