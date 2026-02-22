@@ -5,21 +5,30 @@ const App: React.FC = () => {
   const [view, setView] = useState('calendar');
   const [holidays, setHolidays] = useState<any[]>([]);
   const [country, setCountry] = useState('IN'); // Default India
-  const [availableCountries, setAvailableCountries] = useState<any[]>([]); // Naya: Saari countries ke liye
+  const [availableCountries, setAvailableCountries] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(0); // 0 = January
+  const [selectedHoliday, setSelectedHoliday] = useState<any | null>(null); // Popup ke liye
   const year = 2026;
 
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-  // 1. Duniya ki saari countries fetch karne ka logic
+  // Fetch Countries & Pin India to Top
   useEffect(() => {
     const fetchCountries = async () => {
       try {
         const response = await fetch('https://date.nager.at/api/v3/AvailableCountries');
         const data = await response.json();
-        setAvailableCountries(data);
+        
+        // India ko hamesha top par rakhne ka logic
+        const sortedData = data.sort((a: any, b: any) => {
+          if (a.countryCode === 'IN') return -1;
+          if (b.countryCode === 'IN') return 1;
+          return a.name.localeCompare(b.name);
+        });
+        
+        setAvailableCountries(sortedData);
       } catch (error) {
         console.error("Error fetching countries", error);
       }
@@ -27,7 +36,7 @@ const App: React.FC = () => {
     fetchCountries();
   }, []);
 
-  // 2. Select ki gayi country ke holidays fetch karna
+  // Fetch Holidays
   useEffect(() => {
     const fetchHolidays = async () => {
       setLoading(true);
@@ -41,9 +50,7 @@ const App: React.FC = () => {
         setLoading(false);
       }
     };
-    if (country) {
-      fetchHolidays();
-    }
+    if (country) fetchHolidays();
   }, [country]);
 
   // Calendar Logic
@@ -53,6 +60,14 @@ const App: React.FC = () => {
   const prevMonth = () => setCurrentMonth(prev => Math.max(prev - 1, 0));
   const nextMonth = () => setCurrentMonth(prev => Math.min(prev + 1, 11));
 
+  // Handle Holiday Click
+  const handleDayClick = (dateString: string) => {
+    const holiday = holidays.find(h => h.date === dateString);
+    if (holiday) {
+      setSelectedHoliday(holiday);
+    }
+  };
+
   const renderCalendarDays = () => {
     let days = [];
     for (let i = 0; i < firstDay; i++) {
@@ -61,13 +76,24 @@ const App: React.FC = () => {
     for (let i = 1; i <= daysInMonth; i++) {
       const dateString = `${year}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
       const isHoliday = holidays.some(h => h.date === dateString);
+      
       days.push(
-        <div key={i} className={`calendar-day ${isHoliday ? 'holiday' : ''}`}>
+        <div 
+          key={i} 
+          className={`calendar-day ${isHoliday ? 'holiday' : ''}`}
+          onClick={() => isHoliday ? handleDayClick(dateString) : null}
+        >
           {i}
         </div>
       );
     }
     return days;
+  };
+
+  // Format Date for Popup
+  const formatDateString = (dateStr: string) => {
+    const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateStr).toLocaleDateString('en-US', options);
   };
 
   return (
@@ -76,27 +102,20 @@ const App: React.FC = () => {
         
         {/* CALENDAR VIEW */}
         {view === 'calendar' && (
-          <div className="calendar-view">
+          <div className="calendar-view animation-fade-in">
             <div className="calendar-header">
               <div>
                 <h1 className="month-title">{months[currentMonth]}</h1>
                 <h2 className="year-title">{year}</h2>
               </div>
               <div className="controls">
-                
-                {/* GLOBAL COUNTRY SELECTOR */}
                 <select className="country-select" value={country} onChange={(e) => setCountry(e.target.value)}>
-                  {availableCountries.length > 0 ? (
-                    availableCountries.map((c) => (
-                      <option key={c.countryCode} value={c.countryCode}>
-                        {c.name}
-                      </option>
-                    ))
-                  ) : (
-                    <option value="IN">India</option>
-                  )}
+                  {availableCountries.map((c) => (
+                    <option key={c.countryCode} value={c.countryCode}>
+                      {c.countryCode === 'IN' ? '🇮🇳 India' : c.name}
+                    </option>
+                  ))}
                 </select>
-
                 <div className="nav-arrows">
                   <button onClick={prevMonth}>&lt;</button>
                   <button onClick={nextMonth}>&gt;</button>
@@ -115,15 +134,21 @@ const App: React.FC = () => {
 
         {/* AGENDA VIEW */}
         {view === 'agenda' && (
-          <div className="agenda-view">
-            <h1 style={{ color: '#007aff', marginBottom: '20px' }}>Upcoming Holidays</h1>
+          <div className="agenda-view animation-fade-in">
+            <h1 className="page-title">Upcoming Holidays</h1>
             {loading ? (
-              <p style={{ textAlign: 'center', color: '#888' }}>Loading holidays...</p>
+              <div className="loading-spinner"></div>
             ) : holidays.length > 0 ? (
               holidays.map((h: any, index: number) => (
-                <div key={index} className="agenda-item">
-                  <strong style={{ fontSize: '16px', color: '#1c1c1e' }}>{h.localName}</strong>
-                  <p>{h.date}</p>
+                <div key={index} className="agenda-item animation-slide-up" style={{ animationDelay: `${index * 0.05}s` }}>
+                  <div className="agenda-date">
+                    <span className="agenda-day">{new Date(h.date).getDate()}</span>
+                    <span className="agenda-month">{months[new Date(h.date).getMonth()].substring(0,3)}</span>
+                  </div>
+                  <div className="agenda-details">
+                    <strong>{h.localName}</strong>
+                    <p>{h.name}</p>
+                  </div>
                 </div>
               ))
             ) : (
@@ -134,28 +159,51 @@ const App: React.FC = () => {
 
         {/* ABOUT VIEW */}
         {view === 'about' && (
-          <div className="about-view">
-            <div className="logo-placeholder">H</div>
-            <h2 style={{ textAlign: 'center', marginTop: '15px' }}>Holiday 2026</h2>
-            <p style={{ textAlign: 'center', color: '#888', fontSize: '14px' }}>VERSION 1.0.0</p>
+          <div className="about-view animation-fade-in">
+            <div className="logo-placeholder premium-shadow">H</div>
+            <h2 className="app-name-title">Holiday 2026</h2>
+            <p className="version-text">VERSION 1.0.0 PRO</p>
             
-            <div className="dev-card">
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
+            <div className="dev-card premium-shadow">
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
                 <div className="dev-icon">&lt;/&gt;</div>
                 <div>
-                  <h3 style={{ margin: 0, color: '#333' }}>Sahil</h3>
-                  <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>Lead Developer</p>
+                  <h3 style={{ margin: 0, color: '#1c1c1e', fontSize: '20px' }}>Sahil</h3>
+                  <p style={{ margin: 0, fontSize: '14px', color: '#8e8e93' }}>Lead iOS Developer</p>
                 </div>
               </div>
-              <p style={{ margin: '10px 0', fontSize: '14px', color: '#555' }}>📸 @primexsahil</p>
-              <p style={{ margin: '10px 0', fontSize: '14px', color: '#555' }}>📧 primexsahil45@gmail.com</p>
-              <p style={{ margin: '10px 0', fontSize: '14px', color: '#555' }}>📍 Shimla, HP</p>
+              <div className="dev-info-row"><span className="emoji">📸</span> @primexsahil</div>
+              <div className="dev-info-row"><span className="emoji">📧</span> primexsahil45@gmail.com</div>
+              <div className="dev-info-row"><span className="emoji">📍</span> Shimla, HP</div>
             </div>
           </div>
         )}
       </div>
 
-      <div className="bottom-nav">
+      {/* iOS STYLE BOTTOM SHEET MODAL (POPUP) */}
+      {selectedHoliday && (
+        <div className="modal-overlay" onClick={() => setSelectedHoliday(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-handle"></div>
+            <h2 className="modal-title">{selectedHoliday.localName}</h2>
+            <p className="modal-date-text">🗓️ {formatDateString(selectedHoliday.date)}</p>
+            
+            <div className="fun-fact-box">
+              <h4 style={{ margin: '0 0 5px 0', color: '#007aff' }}>✨ Fun Fact</h4>
+              <p style={{ margin: 0, fontSize: '14px', color: '#555', lineHeight: '1.5' }}>
+                {selectedHoliday.name} is a major public holiday in {availableCountries.find(c => c.countryCode === country)?.name || 'this country'}. People celebrate it with great joy and enthusiasm!
+              </p>
+            </div>
+
+            <button className="modal-close-btn" onClick={() => setSelectedHoliday(null)}>
+              Awesome, Close!
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* BOTTOM NAVIGATION */}
+      <div className="bottom-nav premium-blur">
         <button className={`nav-item ${view === 'calendar' ? 'active' : ''}`} onClick={() => setView('calendar')}>
           <span className="nav-icon">📅</span>
           <span>Calendar</span>
