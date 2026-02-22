@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
+// ✨ NAYI PHOTO YAHAN IMPORT HO RAHI HAI
+import profileImage from './assets/profile.jpg'; 
 
 const App: React.FC = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()); 
@@ -13,7 +15,7 @@ const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
-  // ✨ Naya Safe Animation State
+  // Safe Animation State
   const [slideDirection, setSlideDirection] = useState('fade'); 
   const year = 2026;
 
@@ -36,12 +38,12 @@ const App: React.FC = () => {
   const onTouchEnd = () => {
     if (!touchStartX.current || !touchEndX.current) return;
     const distance = touchStartX.current - touchEndX.current;
-    const minSwipeDistance = 50; // Minimum distance to trigger swipe
+    const minSwipeDistance = 50; 
 
     if (distance > minSwipeDistance) {
-      triggerNextMonth(); // Swipe Left (Next Month)
+      triggerNextMonth(); 
     } else if (distance < -minSwipeDistance) {
-      triggerPrevMonth(); // Swipe Right (Previous Month)
+      triggerPrevMonth(); 
     }
   };
 
@@ -257,7 +259,9 @@ const App: React.FC = () => {
     <div className={`app-container ${isDarkMode ? 'dark-mode' : ''}`}>
       <div className="main-content">
         
-        {/* CALENDAR VIEW */}
+        {/* ====================================
+            CALENDAR VIEW (No changes here) 
+        ==================================== */}
         {view === 'calendar' && (
           <div 
             className="calendar-view"
@@ -266,7 +270,6 @@ const App: React.FC = () => {
             onTouchEnd={onTouchEnd}
           >
             <div className="calendar-header">
-              {/* ✨ Safe Animation Wrapper */}
               <div key={`title-${currentMonth}`} className={`calendar-anim-wrapper ${slideDirection}`}>
                 <h1 className="month-title">{months[currentMonth]}</h1>
                 <h2 className="year-title">{year}</h2>
@@ -285,7 +288,6 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* ✨ Safe Animation Wrapper for Grid */}
             <div key={`grid-${currentMonth}`} className={`calendar-anim-wrapper ${slideDirection}`}>
               <div className="calendar-grid">
                 {daysOfWeek.map(day => (
@@ -297,7 +299,9 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {/* AGENDA VIEW */}
+        {/* ====================================
+            AGENDA VIEW (No changes here) 
+        ==================================== */}
         {view === 'agenda' && (
           <div className="agenda-view animation-fade-in">
             <h1 className="page-title">Upcoming Holidays</h1>
@@ -335,7 +339,9 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {/* ABOUT VIEW */}
+        {/* ====================================
+            ✨ NEW ABOUT VIEW (Updated exactly like image) ✨
+        ==================================== */}
         {view === 'about' && (
           <div className="about-view animation-fade-in">
             <h1 className="page-title">About Developer</h1>
@@ -343,7 +349,8 @@ const App: React.FC = () => {
             <div className="dev-card premium-shadow">
               <div className="dev-profile">
                 <div className="dev-avatar">
-                  <span style={{ fontSize: '30px' }}>👨‍💻</span>
+                  {/* ✨ REAL PHOTO YAHA LAG RAHI HAI */}
+                  <img src={profileImage} alt="Sahil" className="profile-image" />
                 </div>
                 <div className="dev-details">
                   <h3>Sahil</h3>
@@ -380,17 +387,21 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div style={{ textAlign: 'center', marginTop: '30px' }}>
-              <div className="logo-placeholder premium-shadow" style={{ width: 60, height: 60, fontSize: 24, margin: '0 auto' }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-              </div>
-              <p className="version-text" style={{ marginTop: '10px' }}>HOLIDAY 2026 • VERSION 1.0.0 PRO</p>
+            {/* ✨ New Centered Calendar Floating Button */}
+            <div className="fab-container">
+                <button className="fab-btn haptic-btn" onClick={() => handleNavClick('calendar')}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                </button>
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: '10px' }}>
+              <p className="version-text">HOLIDAY 2026 • VERSION 1.0.0 PRO</p>
             </div>
           </div>
         )}
       </div>
 
-      {/* POPUP MODAL */}
+      {/* POPUP MODAL (No changes here) */}
       {selectedHoliday && (
         <div className="modal-overlay" onClick={() => { triggerHaptic(); setSelectedHoliday(null); }}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -424,7 +435,7 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* BOTTOM NAVIGATION */}
+      {/* BOTTOM NAVIGATION (No changes here) */}
       <div className="bottom-nav premium-blur">
         <button className={`nav-item haptic-btn ${view === 'calendar' ? 'active' : ''}`} onClick={() => handleNavClick('calendar')}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
