@@ -1,6 +1,6 @@
-/* Core App Layout - FIXED 100dvh for Mobile */
+/* Core App Layout */
 .app-container {
-  height: 100dvh; /* dvh takes browser bars into account */
+  height: 100dvh; 
   display: flex;
   flex-direction: column;
   background-color: #f2f2f7; 
@@ -10,7 +10,7 @@
 }
 
 .main-content {
-  flex: 1; /* Automatically takes remaining space above nav */
+  flex: 1; 
   overflow-y: auto;
   padding: 25px 20px;
 }
@@ -44,31 +44,46 @@
 .nav-arrows { display: flex; background: #ffffff; border-radius: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); overflow: hidden; }
 .nav-arrows button { background: none; border: none; font-size: 18px; padding: 10px 15px; color: #007aff; font-weight: bold; cursor: pointer; }
 
-/* 🌟 Calendar Grid Layout Fix */
+/* Calendar Grid Layout */
 .calendar-grid { 
   display: grid; 
   grid-template-columns: repeat(7, 1fr); 
-  gap: 8px; /* Safe gap */
+  gap: 8px; 
   text-align: center; 
 }
 .day-name { font-size: 12px; font-weight: 700; color: #8e8e93; margin-bottom: 15px; }
+
+/* Default Day */
 .calendar-day {
   font-size: 16px; color: #1c1c1e; font-weight: 500;
   display: flex; align-items: center; justify-content: center; 
   border-radius: 50%;
-  width: 38px; height: 38px; margin: 0 auto; /* Perfect circle layout */
+  width: 38px; height: 38px; margin: 0 auto; 
   transition: all 0.2s ease;
 }
 
-/* 🌟 Clickable Holiday Bubble */
+/* 🌟 TODAY'S DATE HIGHLIGHT (New Addition) */
+.calendar-day.today {
+  background-color: #e1f0ff;
+  color: #007aff;
+  font-weight: 800;
+  border: 2px solid #007aff;
+}
+
+/* 🌟 Holiday Bubble */
 .calendar-day.holiday {
   background: linear-gradient(135deg, #007aff, #0056b3);
   color: white; font-weight: 700; cursor: pointer;
   box-shadow: 0 6px 14px rgba(0, 122, 255, 0.3);
+  border: none; /* Reset border in case it overlaps with today */
+}
+/* If Today is ALSO a Holiday */
+.calendar-day.today.holiday {
+  box-shadow: 0 0 0 3px white, 0 0 0 5px #007aff, 0 6px 14px rgba(0, 122, 255, 0.3);
 }
 .calendar-day.holiday:active { transform: scale(0.85); }
 
-/* 🌟 iOS Popup Bottom Sheet */
+/* iOS Popup Bottom Sheet */
 .modal-overlay {
   position: absolute; top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
@@ -85,8 +100,14 @@
 .modal-date-text { font-size: 16px; color: #8e8e93; font-weight: 600; margin-bottom: 25px; }
 
 .fun-fact-box {
-  background: #f2f2f7; padding: 20px; border-radius: 20px; margin-bottom: 30px;
+  background: #f2f2f7; padding: 20px; border-radius: 20px; margin-bottom: 15px;
   border-left: 5px solid #007aff;
+}
+
+/* 🔮 ASTROLOGY BOX (New Addition) */
+.astrology-box {
+  background: #fdf5ff; padding: 20px; border-radius: 20px; margin-bottom: 30px;
+  border-left: 5px solid #a020f0;
 }
 
 .modal-close-btn {
@@ -101,6 +122,7 @@
   display: flex; align-items: center; background: #ffffff;
   padding: 15px; border-radius: 20px; margin-bottom: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  position: relative;
 }
 .agenda-date {
   background: #f2f2f7; color: #007aff; border-radius: 15px;
@@ -111,6 +133,12 @@
 .agenda-month { font-size: 12px; font-weight: 700; text-transform: uppercase; }
 .agenda-details strong { font-size: 17px; color: #1c1c1e; }
 .agenda-details p { margin: 4px 0 0 0; font-size: 14px; color: #8e8e93; }
+
+/* 🔮 Zodiac Badge in Agenda */
+.zodiac-badge {
+  position: absolute; right: 15px; top: 15px; font-size: 18px;
+  background: #fdf5ff; padding: 5px; border-radius: 10px; color: #a020f0;
+}
 
 /* About View */
 .premium-shadow { box-shadow: 0 10px 30px rgba(0,0,0,0.08); background: white; }
@@ -126,7 +154,7 @@
 .dev-info-row { margin: 12px 0; font-size: 15px; color: #3a3a3c; font-weight: 500; display: flex; align-items: center; }
 .emoji { margin-right: 10px; font-size: 18px; }
 
-/* 🌟 FIXED Bottom Nav (Won't Hide Anymore) */
+/* Bottom Nav - SAFE */
 .bottom-nav {
   height: 85px;
   display: flex;
@@ -135,8 +163,8 @@
   border-top: 1px solid rgba(0,0,0,0.05);
   background: rgba(255, 255, 255, 0.85); 
   backdrop-filter: saturate(180%) blur(20px);
-  flex-shrink: 0; /* Ensures it never gets squished */
-  padding-bottom: env(safe-area-inset-bottom, 10px); /* iPhone X safe area fix */
+  flex-shrink: 0; 
+  padding-bottom: env(safe-area-inset-bottom, 10px); 
 }
 
 .nav-item {
