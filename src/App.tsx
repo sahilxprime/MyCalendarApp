@@ -14,16 +14,20 @@ const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const year = 2026;
 
+  // ✨ PREMIUM ANIMATION STATES
+  const [animClass, setAnimClass] = useState('fade-in');
+  const [isAnimating, setIsAnimating] = useState(false);
+
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-  // 👆 Swipe Logic Setup (using useRef for smooth performance)
+  // 👆 SWIPE GESTURE LOGIC
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
 
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.targetTouches[0].clientX;
-    touchEndX.current = null; // Reset on new touch
+    touchEndX.current = null; 
   };
 
   const onTouchMove = (e: React.TouchEvent) => {
@@ -31,16 +35,43 @@ const App: React.FC = () => {
   };
 
   const onTouchEnd = () => {
-    if (!touchStartX.current || !touchEndX.current) return;
+    if (!touchStartX.current || !touchEndX.current || isAnimating) return;
     
     const distance = touchStartX.current - touchEndX.current;
-    const minSwipeDistance = 50; // Kitna swipe karne par change hoga
+    const minSwipeDistance = 50; 
 
     if (distance > minSwipeDistance) {
-      nextMonth(); // Swipe Left -> Next Month
+      triggerNextMonth(); // Swipe Left -> Next
     } else if (distance < -minSwipeDistance) {
-      prevMonth(); // Swipe Right -> Prev Month
+      triggerPrevMonth(); // Swipe Right -> Prev
     }
+  };
+
+  // ✨ PREMIUM TRANSITION FUNCTIONS
+  const triggerNextMonth = () => {
+    if (currentMonth >= 11 || isAnimating) return;
+    triggerHaptic();
+    setIsAnimating(true);
+    setAnimClass('slide-out-left'); // Purana month left jayega
+    
+    setTimeout(() => {
+      setCurrentMonth(prev => prev + 1);
+      setAnimClass('slide-in-right'); // Naya month right se aayega
+      setTimeout(() => setIsAnimating(false), 400); // Unlock after animation
+    }, 150); // Out animation time
+  };
+
+  const triggerPrevMonth = () => {
+    if (currentMonth <= 0 || isAnimating) return;
+    triggerHaptic();
+    setIsAnimating(true);
+    setAnimClass('slide-out-right'); // Purana month right jayega
+    
+    setTimeout(() => {
+      setCurrentMonth(prev => prev - 1);
+      setAnimClass('slide-in-left'); // Naya month left se aayega
+      setTimeout(() => setIsAnimating(false), 400);
+    }, 150);
   };
 
   // 📳 Haptic Feedback Logic
@@ -179,9 +210,6 @@ const App: React.FC = () => {
     if (country) fetchHolidays();
   }, [country]);
 
-  const prevMonth = () => { triggerHaptic(); setCurrentMonth(prev => Math.max(prev - 1, 0)); };
-  const nextMonth = () => { triggerHaptic(); setCurrentMonth(prev => Math.min(prev + 1, 11)); };
-
   const handleDayClick = (dateString: string) => {
     triggerHaptic();
     const holiday = holidays.find(h => h.date === dateString);
@@ -203,17 +231,14 @@ const App: React.FC = () => {
     }
   };
 
-  // ✅ LOGIC FIX: Render Calendar Days explicitly handling Keys to fix the March bug
   const renderCalendarDays = () => {
     let days = [];
     const realToday = new Date(); 
     
-    // Calculate fresh for current render
     const currentFirstDay = new Date(year, currentMonth, 1).getDay();
     const currentDaysInMonth = new Date(year, currentMonth + 1, 0).getDate();
 
     for (let i = 0; i < currentFirstDay; i++) {
-      // Month added to key so React forces a clean redraw
       days.push(<div key={`empty-${currentMonth}-${i}`} className="calendar-day empty"></div>);
     }
     for (let i = 1; i <= currentDaysInMonth; i++) {
@@ -250,9 +275,10 @@ const App: React.FC = () => {
         
         {/* CALENDAR VIEW */}
         {view === 'calendar' && (
-          <div className="calendar-view animation-fade-in">
+          <div className="calendar-view">
             <div className="calendar-header">
-              <div>
+              {/* ✨ Month Title par bhi animation lagaya hai */}
+              <div className={`month-title-wrapper ${animClass}`}>
                 <h1 className="month-title">{months[currentMonth]}</h1>
                 <h2 className="year-title">{year}</h2>
               </div>
@@ -267,21 +293,22 @@ const App: React.FC = () => {
                     </option>
                   ))}
                 </select>
-                {/* ❌ Removed the < > Nav Arrows as requested */}
               </div>
             </div>
 
-            {/* ✅ Added Swipe Events directly to Calendar Grid */}
+            {/* ✨ Calendar Grid with Swipe + Animation Classes */}
             <div 
-              className="calendar-grid"
+              className={`calendar-grid-wrapper ${animClass}`}
               onTouchStart={onTouchStart}
               onTouchMove={onTouchMove}
               onTouchEnd={onTouchEnd}
             >
-              {daysOfWeek.map(day => (
-                <div key={day} className="day-name">{day}</div>
-              ))}
-              {renderCalendarDays()}
+              <div className="calendar-grid">
+                {daysOfWeek.map(day => (
+                  <div key={day} className="day-name">{day}</div>
+                ))}
+                {renderCalendarDays()}
+              </div>
             </div>
           </div>
         )}
@@ -341,7 +368,6 @@ const App: React.FC = () => {
               </div>
               
               <div className="dev-links">
-                {/* Clickable Instagram */}
                 <a href="https://instagram.com/primexsahil" target="_blank" rel="noreferrer" className="dev-link-item haptic-btn" onClick={triggerHaptic}>
                   <div className="link-icon insta-gradient">📸</div>
                   <div className="link-text">
@@ -351,7 +377,6 @@ const App: React.FC = () => {
                   <div className="link-arrow">›</div>
                 </a>
 
-                {/* Clickable Email */}
                 <a href="mailto:primexsahil45@gmail.com" className="dev-link-item haptic-btn" onClick={triggerHaptic}>
                   <div className="link-icon email-gradient">📧</div>
                   <div className="link-text">
@@ -361,7 +386,6 @@ const App: React.FC = () => {
                   <div className="link-arrow">›</div>
                 </a>
 
-                {/* Location */}
                 <div className="dev-link-item haptic-btn" onClick={triggerHaptic}>
                   <div className="link-icon location-gradient">📍</div>
                   <div className="link-text">
